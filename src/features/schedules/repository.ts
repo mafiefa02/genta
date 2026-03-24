@@ -196,30 +196,6 @@ export class ScheduleRepository extends FeatureRepository<"schedules"> {
       .where("schedule_id", "=", scheduleId);
   }
 
-  public skipDates(params: {
-    id: Selectable<Schedules>["id"];
-    dates: string[];
-  }) {
-    return this.db.transaction().execute(async (trx) => {
-      for (const date of params.dates) {
-        await trx
-          .insertInto("schedule_overrides")
-          .values({
-            schedule_id: params.id,
-            original_date: date,
-            is_cancelled: 1,
-          })
-          .onConflict((oc) =>
-            oc
-              .columns(["schedule_id", "original_date"])
-              .doUpdateSet({ is_cancelled: 1 }),
-          )
-          .execute();
-      }
-      return { id: params.id };
-    });
-  }
-
   public delete(params: {
     id: Selectable<Schedules>["id"];
     profileId: Selectable<Schedules>["profile_id"];

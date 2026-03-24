@@ -1,7 +1,6 @@
 import { NoDataIllustration } from "@shared/components/illustrations/no-data";
 import { WarningIllustration } from "@shared/components/illustrations/warning";
 import { Button } from "@shared/components/ui/button";
-import { Calendar } from "@shared/components/ui/calendar";
 import { Card, CardContent } from "@shared/components/ui/card";
 import {
 	Dialog,
@@ -15,7 +14,6 @@ import {
 } from "@shared/components/ui/dialog";
 import {
 	Field,
-	FieldDescription,
 	FieldLabel,
 } from "@shared/components/ui/field";
 import { Input } from "@shared/components/ui/input";
@@ -26,11 +24,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@shared/components/ui/select";
-import {
-	Popover,
-	PopoverPopup,
-	PopoverTrigger,
-} from "@shared/components/ui/popover";
 import { Separator } from "@shared/components/ui/separator";
 import { Skeleton } from "@shared/components/ui/skeleton";
 import { Schedules } from "@shared/lib/db";
@@ -43,7 +36,7 @@ import {
 	timeToMinutes,
 } from "@shared/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format, getISODay } from "date-fns";
+import { format } from "date-fns";
 import { Selectable } from "kysely";
 import {
 	CalendarIcon,
@@ -285,7 +278,6 @@ const ScheduleEditButton = ({
 		name: initialData.name,
 		time: minutesToTime(initialData.time),
 		soundId: initialData.soundId,
-		skipDates: [] as Date[],
 	});
 
 	const { data: sounds } = useQuery({
@@ -296,11 +288,6 @@ const ScheduleEditButton = ({
 		],
 	});
 
-	const { data: scheduleDays } = useQuery({
-		...services.schedule.query.getScheduleDays(id),
-		enabled: repeat === "weekly",
-	});
-
 	const { mutate } = useMutation(
 		services.schedule.mutation.updateSchedule({
 			id,
@@ -308,43 +295,28 @@ const ScheduleEditButton = ({
 		}),
 	);
 
-	const { mutate: skipMutate } = useMutation(
-		services.schedule.mutation.skipScheduleDates({ id }),
-	);
-
 	const handleSubmit = useCallback(
 		(e: React.FormEvent) => {
 			e.preventDefault();
-			if (formState.skipDates.length > 0) {
-				skipMutate(
-					formState.skipDates.map((d) => formatDate(d)),
-					{
-						onSuccess: () => {
-							queryClient.invalidateQueries({ queryKey: ["schedules"] });
-						},
+			mutate(
+				{
+					updateType: "all",
+					values: {
+						name: formState.name,
+						time: timeToMinutes(formState.time) || 0,
+						sound_id: formState.soundId,
+						is_cancelled: false,
 					},
-				);
-			} else {
-				mutate(
-					{
-						updateType: "all",
-						values: {
-							name: formState.name,
-							time: timeToMinutes(formState.time) || 0,
-							sound_id: formState.soundId,
-							is_cancelled: false,
-						},
+				},
+				{
+					onSuccess: () => {
+						queryClient.invalidateQueries({ queryKey: ["schedules"] });
 					},
-					{
-						onSuccess: () => {
-							queryClient.invalidateQueries({ queryKey: ["schedules"] });
-						},
-					},
-				);
-			}
+				},
+			);
 			setOpen(false);
 		},
-		[mutate, skipMutate, formState, queryClient],
+		[mutate, formState, queryClient],
 	);
 
 	return (
@@ -416,51 +388,6 @@ const ScheduleEditButton = ({
 								</SelectPopup>
 							</Select>
 						</Field>
-						{repeat === "weekly" && (
-							<Field>
-								<FieldLabel>Skip dates</FieldLabel>
-								<div className="flex flex-col gap-2 w-full">
-									<Popover modal>
-										<PopoverTrigger
-											render={
-												<Button
-													variant="outline"
-													type="button"
-													className="w-full justify-start"
-												/>
-											}
-										>
-											<CalendarIcon className="size-4" />
-											{formState.skipDates.length === 0
-												? "Skip dates..."
-												: formState.skipDates
-														.sort((a, b) => a.getTime() - b.getTime())
-														.map((d) => format(d, "MMM d"))
-														.join(", ")}
-										</PopoverTrigger>
-										<PopoverPopup align="start" side="top">
-											<Calendar
-												className="bg-popover p-0"
-												mode="multiple"
-												selected={formState.skipDates}
-												onSelect={(dates) =>
-													setFormState((prev) => ({
-														...prev,
-														skipDates: dates ?? [],
-													}))
-												}
-												disabled={(date) =>
-													!scheduleDays?.includes(getISODay(date))
-												}
-											/>
-										</PopoverPopup>
-									</Popover>
-								</div>
-								<FieldDescription>
-									Select dates to skip this schedule from playing.
-								</FieldDescription>
-							</Field>
-						)}
 					</DialogPanel>
 					<DialogFooter>
 						<Button

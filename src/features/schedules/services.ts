@@ -104,16 +104,6 @@ export class ScheduleServices extends FeatureServices<ScheduleRepository> {
     }
   }
 
-  private async skipScheduleDates(
-    params: { id: number; dates: string[] },
-  ) {
-    try {
-      return await this.repository.skipDates(params);
-    } catch (e) {
-      return handleThrowError(e);
-    }
-  }
-
   get query() {
     return {
       getSchedules: (params: {
@@ -229,12 +219,6 @@ export class ScheduleServices extends FeatureServices<ScheduleRepository> {
               { ...params, updateType: args.updateType, values: args.values },
               profileId,
             ),
-        }),
-      skipScheduleDates: (params: { id: number }) =>
-        mutationOptions({
-          mutationKey: ["skip-schedule-dates", params],
-          mutationFn: async (dates: string[]) =>
-            this.skipScheduleDates({ ...params, dates }),
         }),
     };
   }
