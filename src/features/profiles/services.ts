@@ -39,6 +39,31 @@ export class ProfileServices extends FeatureServices<ProfileRepository> {
     }
   };
 
+  private getBusinessDays = async (profileId: number) => {
+    try {
+      const result = await this.repository
+        .getBusinessDays(profileId)
+        .executeTakeFirstOrThrow();
+      return JSON.parse(result.business_days) as number[];
+    } catch (e) {
+      return handleThrowError(e);
+    }
+  };
+
+  private setBusinessDays = async (params: {
+    profileId: number;
+    businessDays: number[];
+  }) => {
+    try {
+      return await this.repository.updateBusinessDays(
+        params.profileId,
+        params.businessDays,
+      );
+    } catch (e) {
+      return handleThrowError(e);
+    }
+  };
+
   private deleteProfile = async (id: number) => {
     try {
       return await this.repository.delete(id);
@@ -53,6 +78,11 @@ export class ProfileServices extends FeatureServices<ProfileRepository> {
         queryOptions({
           queryKey: ["profiles", params],
           queryFn: () => this.getProfiles(params),
+        }),
+      getBusinessDays: (profileId: number) =>
+        queryOptions({
+          queryKey: ["business-days", profileId],
+          queryFn: () => this.getBusinessDays(profileId),
         }),
     };
   }
@@ -70,6 +100,10 @@ export class ProfileServices extends FeatureServices<ProfileRepository> {
       deleteProfile: mutationOptions({
         mutationKey: ["delete-profile"],
         mutationFn: this.deleteProfile,
+      }),
+      updateBusinessDays: mutationOptions({
+        mutationKey: ["update-business-days"],
+        mutationFn: this.setBusinessDays,
       }),
     };
   }

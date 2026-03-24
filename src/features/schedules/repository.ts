@@ -1,7 +1,7 @@
 import { FeatureRepository } from "@models/repository";
 import { ScheduleOverrides, Schedules } from "@shared/lib/db";
 import { formatDate, parseDate } from "@shared/lib/utils";
-import { subDays } from "date-fns";
+import { format, subDays } from "date-fns";
 import { Insertable, Selectable, sql } from "kysely";
 
 export class ScheduleRepository extends FeatureRepository<"schedules"> {
@@ -62,7 +62,6 @@ export class ScheduleRepository extends FeatureRepository<"schedules"> {
       )
       .where((eb) =>
         eb.or([
-          eb("schedules.repeat", "=", "daily"),
           eb.and([
             eb("schedules.repeat", "=", "once"),
             eb("schedules.start_date", "=", params.date),
@@ -87,6 +86,35 @@ export class ScheduleRepository extends FeatureRepository<"schedules"> {
         qb.where("schedules.name", "like", `%${params.search}%`),
       )
       .orderBy("final_time", "asc");
+  }
+
+  public findUpcomingOneTime(params: {
+    profileId: Selectable<Schedules>["profile_id"];
+    search?: Selectable<Schedules>["name"];
+  }) {
+    const today = format(new Date(), "yyyy-MM-dd");
+    return this.db
+      .selectFrom("schedules")
+      .leftJoin("sounds", "schedules.sound_id", "sounds.id")
+      .select([
+        "schedules.id",
+        "schedules.name",
+        "schedules.time",
+        "schedules.start_date",
+        "sounds.id as sound_id",
+        "sounds.name as sound_name",
+        "sounds.file_name as sound_file",
+        "schedules.repeat",
+      ])
+      .where("schedules.profile_id", "=", params.profileId)
+      .where("schedules.is_active", "=", 1)
+      .where("schedules.repeat", "=", "once")
+      .where("schedules.start_date", ">=", today)
+      .$if(!!params.search, (qb) =>
+        qb.where("schedules.name", "like", `%${params.search}%`),
+      )
+      .orderBy("schedules.start_date", "asc")
+      .orderBy("schedules.time", "asc");
   }
 
   public insert(value: Insertable<Schedules> & { days?: number[] }) {
@@ -250,6 +278,37 @@ export class ScheduleRepository extends FeatureRepository<"schedules"> {
       )
       .returning("id")
       .executeTakeFirstOrThrow();
+  }
+
+  public findDays(scheduleId: Selectable<Schedules>["id"]) {
+    return this.db
+      .selectFrom("schedule_days")
+      .select("day_of_week")
+      .where("schedule_id", "=", scheduleId);
+  }
+
+  public skipDates(params: {
+    id: Selectable<Schedules>["id"];
+    dates: string[];
+  }) {
+    return this.db.transaction().execute(async (trx) => {
+      for (const date of params.dates) {
+        await trx
+          .insertInto("schedule_overrides")
+          .values({
+            schedule_id: params.id,
+            original_date: date,
+            is_cancelled: 1,
+          })
+          .onConflict((oc) =>
+            oc
+              .columns(["schedule_id", "original_date"])
+              .doUpdateSet({ is_cancelled: 1 }),
+          )
+          .execute();
+      }
+      return { id: params.id };
+    });
   }
 
   public delete(params: {

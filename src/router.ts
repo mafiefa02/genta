@@ -1,4 +1,11 @@
-import { Home, Onboarding, PickProfiles, Profiles, Sounds } from "@pages/index";
+import {
+  Home,
+  Onboarding,
+  PickProfiles,
+  Profiles,
+  Settings,
+  Sounds,
+} from "@pages/index";
 import { Layout } from "@pages/layout";
 import { getProfiles } from "@pages/pick-profiles/loaders/get-profiles";
 import { SetupLayout } from "@pages/setup-layout";
@@ -13,6 +20,7 @@ export const router = createHashRouter([
       { index: true, Component: Home },
       { path: "profiles", Component: Profiles },
       { path: "sounds", Component: Sounds },
+      { path: "settings", Component: Settings },
     ],
   },
   {

@@ -1,75 +1,57 @@
-import { Button, ButtonProps } from "@shared/components/ui/button";
-import { Calendar } from "@shared/components/ui/calendar";
-import {
-  Popover,
-  PopoverPopup,
-  PopoverTrigger,
-} from "@shared/components/ui/popover";
-import { addDays, format } from "date-fns";
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useCallback, useState } from "react";
+import { Button } from "@shared/components/ui/button";
+import { cn } from "@shared/lib/utils";
+import { useCallback } from "react";
 import { useDateContext } from "../contexts/date-context";
 
-export const DateSelector = () => {
-  const [open, setOpen] = useState(false);
-  const { date, setDate } = useDateContext();
+const DAY_LABELS: Record<number, string> = {
+  1: "Mon",
+  2: "Tue",
+  3: "Wed",
+  4: "Thu",
+  5: "Fri",
+  6: "Sat",
+  7: "Sun",
+};
 
-  const handleDateSelect = useCallback(
-    (date: Date | undefined) => {
-      if (date) {
-        setDate(date);
-      }
-      setOpen(false);
-    },
-    [setDate],
-  );
+export const DateSelector = () => {
+  const { selectedDay, setSelectedDay, businessDays } = useDateContext();
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-    >
-      <div className="flex items-center gap-1">
-        <StepDateButton stepAmount={-1}>
-          <ChevronLeftIcon />
-        </StepDateButton>
-        <PopoverTrigger render={<Button variant="outline" />}>
-          <CalendarIcon className="size-4" />
-          <p>{date ? format(date, "PP") : "Select date"}</p>
-        </PopoverTrigger>
-        <StepDateButton stepAmount={1}>
-          <ChevronRightIcon />
-        </StepDateButton>
-      </div>
-      <PopoverPopup>
-        <Calendar
-          className="bg-popover p-0"
-          mode="single"
-          selected={date}
-          onSelect={handleDateSelect}
+    <div className="flex w-full items-center gap-1">
+      {businessDays.map((day) => (
+        <DayTab
+          key={day}
+          day={day}
+          label={DAY_LABELS[day]}
+          isActive={selectedDay === day}
+          onSelect={setSelectedDay}
         />
-      </PopoverPopup>
-    </Popover>
+      ))}
+    </div>
   );
 };
 
-const StepDateButton = ({
-  stepAmount,
-  ...props
-}: ButtonProps & { stepAmount: number }) => {
-  const { setDate } = useDateContext();
-
-  const handleStep = useCallback(
-    () => setDate((prev) => addDays(prev, stepAmount)),
-    [setDate, stepAmount],
-  );
+const DayTab = ({
+  day,
+  label,
+  isActive,
+  onSelect,
+}: {
+  day: number;
+  label: string;
+  isActive: boolean;
+  onSelect: (day: number) => void;
+}) => {
+  const handleClick = useCallback(() => onSelect(day), [onSelect, day]);
 
   return (
     <Button
-      size="icon"
-      variant="outline"
-      onClick={handleStep}
-      {...props}
-    />
+      variant={isActive ? "default" : "outline"}
+      size="sm"
+      className={cn("flex-1", !isActive && "text-muted-foreground")}
+      onClick={handleClick}
+    >
+      {label}
+    </Button>
   );
 };

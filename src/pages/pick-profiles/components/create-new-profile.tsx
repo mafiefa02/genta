@@ -44,6 +44,9 @@ export const CreateNewProfile = ({ className, ...props }: ButtonProps) => {
           {
             onSuccess: () => {
               queryClient.invalidateQueries({ queryKey: ["profiles"] });
+              queryClient.invalidateQueries({
+                queryKey: ["config", "active_profile"],
+              });
               navigate("/");
               resolve();
             },

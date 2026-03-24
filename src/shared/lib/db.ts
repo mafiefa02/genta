@@ -14,6 +14,7 @@ export interface Profiles {
   id: Generated<number>;
   name: string;
   timezone: string;
+  business_days: Generated<string>; // JSON array of ISO day numbers, e.g. '[1,2,3,4,5]'
 }
 
 export interface Extensions {
@@ -40,7 +41,7 @@ export interface Schedules {
   time: number; // Minutes from midnight
   start_date: string; // YYYY-MM-DD
   end_date: string | null; // YYYY-MM-DD
-  repeat: Generated<"once" | "daily" | "weekly">;
+  repeat: Generated<"once" | "weekly">;
   is_active: Generated<number>; // 0 or 1
   created_at: Generated<string>;
   updated_at: string | null;

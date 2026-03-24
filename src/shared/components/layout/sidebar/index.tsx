@@ -21,6 +21,7 @@ import {
   MenuIcon,
   PanelLeftClose,
   PanelLeftOpen,
+  SettingsIcon,
   TimerIcon,
   Volume2Icon,
 } from "lucide-react";
@@ -32,6 +33,7 @@ const MENUS = [
   { label: "Schedules", to: "/", icon: <TimerIcon /> },
   { label: "Profiles", to: "/profiles", icon: <CalendarIcon /> },
   { label: "Sounds", to: "/sounds", icon: <Volume2Icon /> },
+  { label: "Settings", to: "/settings", icon: <SettingsIcon /> },
 ];
 
 interface SidebarItemProps {

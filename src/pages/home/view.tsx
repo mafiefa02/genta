@@ -10,13 +10,11 @@ export const Home = () => {
   return (
     <div className="flex w-full flex-1 flex-col gap-3">
       <DateProvider>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-1">
-            <h1 className="text-2xl font-semibold">Schedules</h1>
-            <GoToToday />
-          </div>
-          <DateSelector />
+        <div className="flex items-center gap-1">
+          <h1 className="text-2xl font-semibold">Schedules</h1>
+          <GoToToday />
         </div>
+        <DateSelector />
 
         <SearchProvider>
           <div className="flex items-center gap-2">

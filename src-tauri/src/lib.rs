@@ -66,13 +66,12 @@ pub fn run() {
             sql: include_str!("../db/migrations/0001_initial_schema.sql"),
             kind: tauri_plugin_sql::MigrationKind::Up,
         },
-        // OPTIONAL: seeds the database
-        // Migration {
-        //     version: 2,
-        //     description: "seed_demo_data",
-        //     sql: include_str!("../db/migrations/0002_seed_demo_data.sql"),
-        //     kind: tauri_plugin_sql::MigrationKind::Up,
-        // },
+        Migration {
+            version: 2,
+            description: "add_business_days",
+            sql: include_str!("../db/migrations/0002_add_business_days.sql"),
+            kind: tauri_plugin_sql::MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()

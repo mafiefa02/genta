@@ -1,63 +1,36 @@
-import { Field, FieldLabel } from "@shared/components/ui/field";
-import {
-  Toggle,
-  ToggleGroup,
-  ToggleGroupSeparator,
-} from "@shared/components/ui/toggle-group";
+import { Checkbox } from "@shared/components/ui/checkbox";
 import { useCallback } from "react";
 import { scheduleFormContext } from "../context";
 
-type RepeatType = "once" | "daily" | "weekly";
+type RepeatType = "once" | "weekly";
 
-interface RepeatFieldProps {
-  label: string;
-}
-
-export const RepeatField = ({ label }: RepeatFieldProps) => {
+export const RepeatField = () => {
   const field = scheduleFormContext.useFieldContext<RepeatType>();
-  const handleChange = useCallback(
-    (value: RepeatType[]) =>
-      value.length > 0
-        ? field.handleChange(value[0])
-        : field.form.resetField(field.name),
-    [field],
-  );
+  const isOnce = field.state.value === "once";
+
+  const handleToggle = useCallback(() => {
+    field.handleChange(isOnce ? "weekly" : "once");
+  }, [field, isOnce]);
 
   return (
-    <Field
-      name={field.name}
-      invalid={field.state.meta.errors.length > 0}
-      className="w-full"
+    <div
+      onClick={handleToggle}
+      className="flex cursor-pointer flex-row items-start justify-between gap-2 rounded-lg border p-3 hover:bg-accent/50 has-data-checked:bg-accent/50"
+      data-checked={isOnce || undefined}
     >
-      <FieldLabel>{label}</FieldLabel>
-      <ToggleGroup
-        value={[field.state.value]}
-        onValueChange={handleChange}
-        onBlur={field.handleBlur}
-        variant="outline"
-        className="w-full"
-      >
-        <Toggle
-          className="flex-1"
-          value="once"
-        >
-          Once
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="daily"
-        >
-          Daily
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="weekly"
-        >
-          Weekly
-        </Toggle>
-      </ToggleGroup>
-    </Field>
+      <div className="pointer-events-none flex flex-col gap-1">
+        <span className="text-sm font-medium">Play once</span>
+        <span className="text-xs text-muted-foreground">
+          Play this schedule only once on a specific date.
+        </span>
+      </div>
+      <Checkbox
+        checked={isOnce}
+        onCheckedChange={(checked) =>
+          field.handleChange(checked ? "once" : "weekly")
+        }
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
   );
 };
