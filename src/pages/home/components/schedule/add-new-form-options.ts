@@ -1,14 +1,10 @@
-import { timeToMinutes } from "@shared/lib/utils";
+import { getNextOccurrence, timeToMinutes } from "@shared/lib/utils";
 import { formOptions } from "@tanstack/react-form";
 import { format, getISODay } from "date-fns";
 import { minutesInDay } from "date-fns/constants";
 import z from "zod";
 
-const repeatType = z.union([
-  z.literal("once"),
-  z.literal("daily"),
-  z.literal("weekly"),
-]);
+const repeatType = z.union([z.literal("once"), z.literal("weekly")]);
 
 export const schema = z
   .object({
@@ -27,15 +23,12 @@ export const schema = z
       .positive({ error: "Please provide a valid time!" })
       .max(minutesInDay, { error: "Time is invalid!" })
       .nonoptional(),
-    days: z
-      .array(
-        z
-          .number({ error: "Please provide a valid day!" })
-          .min(1, { error: "Please provide a valid day!" })
-          .max(7, { error: "Please provide a valid day!" }),
-      )
-      .min(1, { error: "Please select at least one repeat day!" })
-      .nonoptional({ error: "Repeat day is required!" }),
+    days: z.array(
+      z
+        .number({ error: "Please provide a valid day!" })
+        .min(1, { error: "Please provide a valid day!" })
+        .max(7, { error: "Please provide a valid day!" }),
+    ),
     repeat: repeatType.nonoptional({ error: "Please provide a repeat type!" }),
     sound: z.number({ error: "Sound is invalid!" }).nullable(),
   })
@@ -44,20 +37,22 @@ export const schema = z
     path: ["endDate"],
     abort: true,
   })
-  .refine((v) => (v.repeat === "daily" ? v.days.length === 7 : true), {
-    error: "Repeat type is set to daily but not all days are selected!",
+  .refine((v) => (v.repeat === "weekly" ? v.days.length >= 1 : true), {
+    error: "Please select at least one repeat day!",
     path: ["days"],
     abort: true,
   });
 
+const defaultDays = [getISODay(new Date())];
+
 export const scheduleFormOpts = formOptions({
   defaultValues: {
     name: "",
-    startDate: new Date(),
+    startDate: getNextOccurrence(defaultDays),
     endDate: null as Date | null,
     time: timeToMinutes(format(new Date(), "HH:mm")) as number,
-    repeat: "once" as z.infer<typeof repeatType>,
-    days: [getISODay(new Date())],
+    repeat: "weekly" as z.infer<typeof repeatType>,
+    days: defaultDays,
     sound: null as number | null,
   },
   validators: { onSubmit: schema },

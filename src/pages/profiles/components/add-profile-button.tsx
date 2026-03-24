@@ -36,6 +36,9 @@ export const AddProfileButton = () => {
           onSuccess: () => {
             setOpen(false);
             queryClient.invalidateQueries({ queryKey: ["profiles"] });
+            queryClient.invalidateQueries({
+              queryKey: ["config", "active_profile"],
+            });
           },
         },
       );

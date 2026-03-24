@@ -1,6 +1,6 @@
 [package]
 name = "genta"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Tauri App"
 authors = ["Muhammad Afief Abdurrahman"]
 edition = "2021"
@@ -29,3 +29,5 @@ sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio"] }
 chrono = "0.4.42"
 rodio = "0.17"
 tokio = { version = "1.48.0", features = ["full"] }
+tauri-plugin-updater = "2.10.0"
+tauri-plugin-process = "2.3.1"

@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
-import { format, parse } from "date-fns";
+import { addDays, format, getISODay, parse } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 /** Merge classes value */
@@ -31,6 +31,21 @@ export const timeToMinutes = (time: string) => {
   const [h, m] = time.split(":").map(Number);
   if (isNaN(h) || isNaN(m)) return undefined;
   return h * 60 + m;
+};
+
+/**
+ * Given an array of ISO day numbers (1=Mon, 7=Sun), returns the nearest
+ * future Date matching any of those days. Today counts if it matches.
+ */
+export const getNextOccurrence = (days: number[], from: Date = new Date()) => {
+  if (days.length === 0) return from;
+  const today = getISODay(from);
+  if (days.includes(today)) return from;
+  for (let offset = 1; offset <= 7; offset++) {
+    const candidate = addDays(from, offset);
+    if (days.includes(getISODay(candidate))) return candidate;
+  }
+  return from;
 };
 
 /** Handles general error */

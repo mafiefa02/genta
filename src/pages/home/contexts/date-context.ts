@@ -1,8 +1,10 @@
 import { createContext, useContext } from "react";
 
 type DateContextType = {
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  selectedDay: number; // ISO day of week (1=Mon, 7=Sun)
+  setSelectedDay: (day: number) => void;
+  date: Date; // Derived: next occurrence of selectedDay
+  businessDays: number[];
 };
 
 export const DateContext = createContext<DateContextType | undefined>(

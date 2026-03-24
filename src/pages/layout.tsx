@@ -2,11 +2,13 @@ import { Footer } from "@shared/components/layout/footer";
 import { Header } from "@shared/components/layout/header";
 import { Sidebar, SidebarProvider } from "@shared/components/layout/sidebar";
 import { ScrollFade } from "@shared/components/scroll-fade";
+import { UpdateChecker } from "@shared/components/update-checker";
 import { Outlet } from "react-router";
 
 export const Layout = () => {
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-sidebar">
+      <UpdateChecker />
       <SidebarProvider>
         <Header />
         <div className="flex flex-1 overflow-hidden">

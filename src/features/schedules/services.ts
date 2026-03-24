@@ -19,6 +19,17 @@ export class ScheduleServices extends FeatureServices<ScheduleRepository> {
     }
   }
 
+  private async getUpcomingOneTimeSchedules(params: {
+    profileId: Selectable<Schedules>["profile_id"];
+    search?: Selectable<Schedules>["name"];
+  }) {
+    try {
+      return await this.repository.findUpcomingOneTime(params).execute();
+    } catch (e) {
+      return handleThrowError(e);
+    }
+  }
+
   private async createSchedule(
     params: { profileId: Schedules["profile_id"] | "currentProfile" },
     values: Omit<Insertable<Schedules>, "profile_id"> & { days: number[] },
@@ -84,6 +95,25 @@ export class ScheduleServices extends FeatureServices<ScheduleRepository> {
     }
   }
 
+  private async getScheduleDays(scheduleId: number) {
+    try {
+      const rows = await this.repository.findDays(scheduleId).execute();
+      return rows.map((r) => r.day_of_week);
+    } catch (e) {
+      return handleThrowError(e);
+    }
+  }
+
+  private async skipScheduleDates(
+    params: { id: number; dates: string[] },
+  ) {
+    try {
+      return await this.repository.skipDates(params);
+    } catch (e) {
+      return handleThrowError(e);
+    }
+  }
+
   get query() {
     return {
       getSchedules: (params: {
@@ -108,6 +138,37 @@ export class ScheduleServices extends FeatureServices<ScheduleRepository> {
               });
 
               return result;
+            } catch (e) {
+              return handleThrowError(e);
+            }
+          },
+        });
+      },
+      getScheduleDays: (scheduleId: number) => {
+        return queryOptions({
+          queryKey: ["schedule-days", scheduleId],
+          queryFn: () => this.getScheduleDays(scheduleId),
+        });
+      },
+      getUpcomingOneTimeSchedules: (params: {
+        profileId: Selectable<Schedules>["profile_id"] | "currentProfile";
+        search?: Selectable<Schedules>["name"];
+      }) => {
+        return queryOptions({
+          queryKey: ["schedules", "one-time", params],
+          queryFn: async () => {
+            try {
+              const pid =
+                params.profileId === "currentProfile"
+                  ? await this.config.get("active_profile")
+                  : params.profileId;
+
+              if (!pid) throw new Error("No profile specified!");
+
+              return await this.getUpcomingOneTimeSchedules({
+                ...params,
+                profileId: pid,
+              });
             } catch (e) {
               return handleThrowError(e);
             }
@@ -168,6 +229,12 @@ export class ScheduleServices extends FeatureServices<ScheduleRepository> {
               { ...params, updateType: args.updateType, values: args.values },
               profileId,
             ),
+        }),
+      skipScheduleDates: (params: { id: number }) =>
+        mutationOptions({
+          mutationKey: ["skip-schedule-dates", params],
+          mutationFn: async (dates: string[]) =>
+            this.skipScheduleDates({ ...params, dates }),
         }),
     };
   }

@@ -7,11 +7,22 @@ import {
 import { useCallback } from "react";
 import { scheduleFormContext } from "../context";
 
+const DAY_LABELS: Record<number, string> = {
+  1: "Mon",
+  2: "Tue",
+  3: "Wed",
+  4: "Thu",
+  5: "Fri",
+  6: "Sat",
+  7: "Sun",
+};
+
 interface DaysFieldProps {
   label: string;
+  businessDays: number[];
 }
 
-export const DaysField = ({ label }: DaysFieldProps) => {
+export const DaysField = ({ label, businessDays }: DaysFieldProps) => {
   const field = scheduleFormContext.useFieldContext<number[]>();
   const value = field.state.value.map(String);
   const handleChange = useCallback(
@@ -38,54 +49,14 @@ export const DaysField = ({ label }: DaysFieldProps) => {
         className="w-full"
         multiple
       >
-        <Toggle
-          className="flex-1"
-          value="1"
-        >
-          Mon
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="2"
-        >
-          Tue
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="3"
-        >
-          Wed
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="4"
-        >
-          Thu
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="5"
-        >
-          Fri
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="6"
-        >
-          Sat
-        </Toggle>
-        <ToggleGroupSeparator />
-        <Toggle
-          className="flex-1"
-          value="7"
-        >
-          Sun
-        </Toggle>
+        {businessDays.map((day, i) => (
+          <span key={day} className="contents">
+            {i > 0 && <ToggleGroupSeparator />}
+            <Toggle className="flex-1" value={String(day)}>
+              {DAY_LABELS[day]}
+            </Toggle>
+          </span>
+        ))}
       </ToggleGroup>
     </Field>
   );

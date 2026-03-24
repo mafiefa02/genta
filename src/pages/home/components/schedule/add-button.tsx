@@ -12,15 +12,17 @@ import {
   DialogTrigger,
 } from "@shared/components/ui/dialog";
 import { services } from "@shared/lib/services";
-import { formatDate } from "@shared/lib/utils";
+import { formatDate, getNextOccurrence } from "@shared/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useDateContext } from "../../contexts/date-context";
 import { AddNewScheduleForm } from "./add-new-form";
 import { scheduleFormOpts } from "./add-new-form-options";
 
 export const AddNewScheduleButton = (props: ButtonProps) => {
   const [open, setOpen] = useState(false);
+  const { selectedDay } = useDateContext();
 
   const { mutate } = useMutation(
     services.schedule.mutation.insertSchedule({ profileId: "currentProfile" }),
@@ -29,6 +31,11 @@ export const AddNewScheduleButton = (props: ButtonProps) => {
   const queryClient = useQueryClient();
   const scheduleForm = scheduleFormHook.useAppForm({
     ...scheduleFormOpts,
+    defaultValues: {
+      ...scheduleFormOpts.defaultValues,
+      days: [selectedDay],
+      startDate: getNextOccurrence([selectedDay]),
+    },
     onSubmit: ({ value }) =>
       mutate(
         {

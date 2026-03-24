@@ -56,7 +56,7 @@ export const GlobalProfileSelector = () => {
     <Select
       items={profiles.data}
       onValueChange={handleChange}
-      defaultValue={activeProfile.data}
+      value={activeProfile.data}
     >
       <SelectTrigger>
         <CalendarIcon />

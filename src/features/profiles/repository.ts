@@ -13,6 +13,7 @@ export class ProfileRepository extends FeatureRepository<"profiles"> {
         "profiles.id",
         "profiles.name",
         "profiles.timezone",
+        "profiles.business_days",
         fn.count<number>("schedules.id").as("schedule_count"),
       ])
       .$if(!!params?.search, (qb) =>
@@ -30,6 +31,22 @@ export class ProfileRepository extends FeatureRepository<"profiles"> {
       .updateTable(this.table)
       .set(profile)
       .where("id", "=", id)
+      .returning("id")
+      .executeTakeFirstOrThrow();
+  }
+
+  public getBusinessDays(profileId: number) {
+    return this.db
+      .selectFrom(this.table)
+      .select("business_days")
+      .where("id", "=", profileId);
+  }
+
+  public updateBusinessDays(profileId: number, businessDays: number[]) {
+    return this.db
+      .updateTable(this.table)
+      .set({ business_days: JSON.stringify(businessDays) })
+      .where("id", "=", profileId)
       .returning("id")
       .executeTakeFirstOrThrow();
   }
