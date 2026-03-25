@@ -1,9 +1,7 @@
+import { useBusinessDays } from "@features/profiles/hooks";
+import { Button } from "@shared/components/ui/button";
 import { Field, FieldLabel } from "@shared/components/ui/field";
-import {
-  Toggle,
-  ToggleGroup,
-  ToggleGroupSeparator,
-} from "@shared/components/ui/toggle-group";
+import { cn } from "@shared/lib/utils";
 import { useCallback } from "react";
 import { scheduleFormContext } from "../context";
 
@@ -19,20 +17,25 @@ const DAY_LABELS: Record<number, string> = {
 
 interface DaysFieldProps {
   label: string;
-  businessDays: number[];
 }
 
-export const DaysField = ({ label, businessDays }: DaysFieldProps) => {
+export const DaysField = ({ label }: DaysFieldProps) => {
   const field = scheduleFormContext.useFieldContext<number[]>();
-  const value = field.state.value.map(String);
-  const handleChange = useCallback(
-    (value: string[]) => {
-      const mapped = value.map(Number);
-      return value.length > 0 && mapped.every((v) => !isNaN(v))
-        ? field.handleChange(mapped)
+  const selectedDays = field.state.value;
+  const businessDays = useBusinessDays();
+
+  const handleToggle = useCallback(
+    (day: number) => {
+      const isSelected = selectedDays.includes(day);
+      const next = isSelected
+        ? selectedDays.filter((d) => d !== day)
+        : [...selectedDays, day].sort((a, b) => a - b);
+
+      return next.length > 0
+        ? field.handleChange(next)
         : field.form.resetField(field.name);
     },
-    [field],
+    [field, selectedDays],
   );
 
   return (
@@ -41,23 +44,22 @@ export const DaysField = ({ label, businessDays }: DaysFieldProps) => {
       invalid={field.state.meta.errors.length > 0}
     >
       <FieldLabel>{label}</FieldLabel>
-      <ToggleGroup
-        value={value}
-        onValueChange={handleChange}
-        onBlur={field.handleBlur}
-        variant="outline"
-        className="w-full"
-        multiple
-      >
-        {businessDays.map((day, i) => (
-          <span key={day} className="contents">
-            {i > 0 && <ToggleGroupSeparator />}
-            <Toggle className="flex-1" value={String(day)}>
+      <div className="flex w-full items-center gap-1">
+        {businessDays.map((day) => {
+          const isActive = selectedDays.includes(day);
+          return (
+            <Button
+              key={day}
+              variant={isActive ? "default" : "outline"}
+              size="sm"
+              className={cn("flex-1", !isActive && "text-muted-foreground")}
+              onClick={() => handleToggle(day)}
+            >
               {DAY_LABELS[day]}
-            </Toggle>
-          </span>
-        ))}
-      </ToggleGroup>
+            </Button>
+          );
+        })}
+      </div>
     </Field>
   );
 };

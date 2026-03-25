@@ -46,7 +46,7 @@ export const AddNewScheduleForm = scheduleFormHook.withForm({
         <form.Subscribe
           selector={(state) => state.values.repeat}
           children={(repeat) =>
-            repeat === "once" && (
+            repeat === "once" ? (
               <form.AppField
                 name="startDate"
                 children={(field) => (
@@ -59,6 +59,11 @@ export const AddNewScheduleForm = scheduleFormHook.withForm({
                     }}
                   />
                 )}
+              />
+            ) : (
+              <form.AppField
+                name="days"
+                children={(field) => <field.DaysField label="Days" />}
               />
             )
           }
