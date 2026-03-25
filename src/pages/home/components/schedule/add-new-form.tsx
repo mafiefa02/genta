@@ -2,9 +2,9 @@ import { scheduleFormHook } from "@features/schedules/components/forms/hook";
 import { useRef } from "react";
 import { scheduleFormOpts } from "./add-new-form-options";
 
-export const AddNewScheduleForm = scheduleFormHook.withForm({
+const AddNewScheduleFormContent = scheduleFormHook.withForm({
   ...scheduleFormOpts,
-  render: ({ form }) => {
+  render: function AddNewScheduleFormRender({ form }) {
     const savedDaysRef = useRef<number[]>([]);
 
     return (
@@ -76,3 +76,5 @@ export const AddNewScheduleForm = scheduleFormHook.withForm({
     );
   },
 });
+
+export { AddNewScheduleFormContent as AddNewScheduleForm };
