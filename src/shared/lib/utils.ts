@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
-import { addDays, format, getISODay, parse } from "date-fns";
+import { addDays, format, getISODay, parse, startOfISOWeek } from "date-fns";
 import { twMerge } from "tailwind-merge";
 
 /** Merge classes value */
@@ -47,6 +47,12 @@ export const getNextOccurrence = (days: number[], from: Date = new Date()) => {
   }
   return from;
 };
+
+/** ISO day-of-week number (1=Mon … 7=Sun) → short label */
+const refMonday = startOfISOWeek(new Date());
+export const ISO_DAY_LABELS: Record<number, string> = Object.fromEntries(
+  Array.from({ length: 7 }, (_, i) => [i + 1, format(addDays(refMonday, i), "EEE")]),
+);
 
 /** Handles general error */
 export const handleThrowError = (e: unknown): never => {

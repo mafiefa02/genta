@@ -32,6 +32,7 @@ import { services } from "@shared/lib/services";
 import {
 	cn,
 	formatDate,
+	ISO_DAY_LABELS,
 	minutesToTime,
 	timeToMinutes,
 } from "@shared/lib/utils";
@@ -47,7 +48,8 @@ import {
 	TrashIcon,
 	Volume2Icon,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useBusinessDays } from "@features/profiles/hooks";
 import { useDateContext } from "../contexts/date-context";
 import { useSearchContext } from "../contexts/search-context";
 
@@ -242,6 +244,7 @@ const ScheduleListItem = ({
 					<ScheduleEditButton
 						id={id}
 						initialData={{ name, time, soundId }}
+						repeat={repeat}
 						scheduleDate={scheduleDate}
 					/>
 					<ScheduleDeleteButton
@@ -257,6 +260,7 @@ const ScheduleListItem = ({
 const ScheduleEditButton = ({
 	id,
 	initialData,
+	repeat,
 	scheduleDate,
 }: {
 	id: Selectable<Schedules>["id"];
@@ -265,16 +269,30 @@ const ScheduleEditButton = ({
 		time: number;
 		soundId: number | null;
 	};
+	repeat?: Selectable<Schedules>["repeat"];
 	scheduleDate: Date;
 }) => {
 	const [open, setOpen] = useState(false);
 	const queryClient = useQueryClient();
+	const businessDays = useBusinessDays();
 
 	const [formState, setFormState] = useState({
 		name: initialData.name,
 		time: minutesToTime(initialData.time),
 		soundId: initialData.soundId,
+		days: [] as number[],
 	});
+
+	const { data: existingDays } = useQuery({
+		...services.schedule.query.getScheduleDays(id),
+		enabled: repeat === "weekly",
+	});
+
+	useEffect(() => {
+		if (existingDays) {
+			setFormState((prev) => ({ ...prev, days: existingDays }));
+		}
+	}, [existingDays]);
 
 	const { data: sounds } = useQuery({
 		...services.sound.query.getSounds,
@@ -302,18 +320,32 @@ const ScheduleEditButton = ({
 						time: timeToMinutes(formState.time) || 0,
 						sound_id: formState.soundId,
 						is_cancelled: false,
+						...(repeat === "weekly" && { days: formState.days }),
 					},
 				},
 				{
 					onSuccess: () => {
 						queryClient.invalidateQueries({ queryKey: ["schedules"] });
+						queryClient.invalidateQueries({
+							queryKey: ["schedule-days", id],
+						});
 					},
 				},
 			);
 			setOpen(false);
 		},
-		[mutate, formState, queryClient],
+		[mutate, formState, queryClient, repeat, id],
 	);
+
+	const handleToggleDay = useCallback((day: number) => {
+		setFormState((prev) => {
+			const isSelected = prev.days.includes(day);
+			const next = isSelected
+				? prev.days.filter((d) => d !== day)
+				: [...prev.days, day].sort((a, b) => a - b);
+			return { ...prev, days: next.length > 0 ? next : prev.days };
+		});
+	}, []);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
@@ -348,6 +380,31 @@ const ScheduleEditButton = ({
 								}
 							/>
 						</Field>
+						{repeat === "weekly" && (
+							<Field>
+								<FieldLabel>Days</FieldLabel>
+								<div className="flex w-full items-center gap-1">
+									{businessDays.map((day) => {
+										const isActive = formState.days.includes(day);
+										return (
+											<Button
+												key={day}
+												type="button"
+												variant={isActive ? "default" : "outline"}
+												size="sm"
+												className={cn(
+													"flex-1",
+													!isActive && "text-muted-foreground",
+												)}
+												onClick={() => handleToggleDay(day)}
+											>
+												{ISO_DAY_LABELS[day]}
+											</Button>
+										);
+									})}
+								</div>
+							</Field>
+						)}
 						<Field>
 							<FieldLabel>Sound</FieldLabel>
 							<Select
