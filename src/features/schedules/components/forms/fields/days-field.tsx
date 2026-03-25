@@ -1,19 +1,9 @@
 import { useBusinessDays } from "@features/profiles/hooks";
 import { Button } from "@shared/components/ui/button";
 import { Field, FieldLabel } from "@shared/components/ui/field";
-import { cn } from "@shared/lib/utils";
+import { cn, ISO_DAY_LABELS } from "@shared/lib/utils";
 import { useCallback } from "react";
 import { scheduleFormContext } from "../context";
-
-const DAY_LABELS: Record<number, string> = {
-  1: "Mon",
-  2: "Tue",
-  3: "Wed",
-  4: "Thu",
-  5: "Fri",
-  6: "Sat",
-  7: "Sun",
-};
 
 interface DaysFieldProps {
   label: string;
@@ -55,7 +45,7 @@ export const DaysField = ({ label }: DaysFieldProps) => {
               className={cn("flex-1", !isActive && "text-muted-foreground")}
               onClick={() => handleToggle(day)}
             >
-              {DAY_LABELS[day]}
+              {ISO_DAY_LABELS[day]}
             </Button>
           );
         })}

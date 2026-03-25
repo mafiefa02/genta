@@ -1,17 +1,7 @@
 import { Button } from "@shared/components/ui/button";
-import { cn } from "@shared/lib/utils";
+import { cn, ISO_DAY_LABELS } from "@shared/lib/utils";
 import { useCallback } from "react";
 import { useDateContext } from "../contexts/date-context";
-
-const DAY_LABELS: Record<number, string> = {
-  1: "Mon",
-  2: "Tue",
-  3: "Wed",
-  4: "Thu",
-  5: "Fri",
-  6: "Sat",
-  7: "Sun",
-};
 
 export const DateSelector = () => {
   const { selectedDay, setSelectedDay, businessDays } = useDateContext();
@@ -22,7 +12,7 @@ export const DateSelector = () => {
         <DayTab
           key={day}
           day={day}
-          label={DAY_LABELS[day]}
+          label={ISO_DAY_LABELS[day]}
           isActive={selectedDay === day}
           onSelect={setSelectedDay}
         />

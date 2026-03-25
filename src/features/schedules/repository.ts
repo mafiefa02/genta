@@ -146,6 +146,7 @@ export class ScheduleRepository extends FeatureRepository<"schedules"> {
       time: number;
       sound_id: number | null;
       is_cancelled: boolean;
+      days?: number[];
     };
   }) {
     if (params.updateType === "only") {
@@ -171,22 +172,43 @@ export class ScheduleRepository extends FeatureRepository<"schedules"> {
         .executeTakeFirstOrThrow();
     }
 
-    return this.db
-      .updateTable(this.table)
-      .set({
-        name: params.values.name,
-        time: params.values.time,
-        sound_id: params.values.sound_id,
-        is_active: params.values.is_cancelled ? 0 : 1,
-      })
-      .where((eb) =>
-        eb.and([
-          eb("id", "=", params.id),
-          eb("profile_id", "=", params.profileId),
-        ]),
-      )
-      .returning("id")
-      .executeTakeFirstOrThrow();
+    return this.db.transaction().execute(async (trx) => {
+      const result = await trx
+        .updateTable(this.table)
+        .set({
+          name: params.values.name,
+          time: params.values.time,
+          sound_id: params.values.sound_id,
+          is_active: params.values.is_cancelled ? 0 : 1,
+        })
+        .where((eb) =>
+          eb.and([
+            eb("id", "=", params.id),
+            eb("profile_id", "=", params.profileId),
+          ]),
+        )
+        .returning("id")
+        .executeTakeFirstOrThrow();
+
+      if (params.values.days && params.values.days.length > 0) {
+        await trx
+          .deleteFrom("schedule_days")
+          .where("schedule_id", "=", params.id)
+          .execute();
+
+        await trx
+          .insertInto("schedule_days")
+          .values(
+            params.values.days.map((day) => ({
+              schedule_id: params.id,
+              day_of_week: day,
+            })),
+          )
+          .execute();
+      }
+
+      return result;
+    });
   }
 
   public findDays(scheduleId: Selectable<Schedules>["id"]) {
