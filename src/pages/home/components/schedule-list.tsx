@@ -340,7 +340,7 @@ const ScheduleEditForm = ({
 		select: selectSounds,
 	});
 
-	const { mutate } = useMutation(
+	const { mutate, isPending } = useMutation(
 		services.schedule.mutation.updateSchedule({
 			id,
 			date: format(scheduleDate, "yyyy-MM-dd"),
@@ -367,10 +367,10 @@ const ScheduleEditForm = ({
 						queryClient.invalidateQueries({
 							queryKey: ["schedule-days", id],
 						});
+						onClose();
 					},
 				},
 			);
-			onClose();
 		},
 		[mutate, formState, queryClient, repeat, id, onClose],
 	);
@@ -480,10 +480,11 @@ const ScheduleEditForm = ({
 					type="button"
 					variant="ghost"
 					onClick={onClose}
+					disabled={isPending}
 				>
 					Cancel
 				</Button>
-				<Button type="submit">Save Changes</Button>
+				<Button type="submit" disabled={isPending}>Save Changes</Button>
 			</DialogFooter>
 		</form>
 	);
@@ -530,9 +531,9 @@ const ScheduleDeleteButton = ({
 							mutate("all", {
 								onSuccess: () => {
 									queryClient.invalidateQueries({ queryKey: ["schedules"] });
+									setOpen(false);
 								},
 							});
-							setOpen(false);
 						}}
 					>
 						Delete
