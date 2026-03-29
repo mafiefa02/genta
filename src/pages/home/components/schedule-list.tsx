@@ -10,7 +10,6 @@ import {
 	DialogPanel,
 	DialogPopup,
 	DialogTitle,
-	DialogTrigger,
 } from "@shared/components/ui/dialog";
 import {
 	Field,
@@ -72,44 +71,81 @@ export const ScheduleList = ({
 	const oneTimeSchedules = data?.filter((s) => s.repeat === "once");
 	const weeklySchedules = data?.filter((s) => s.repeat === "weekly");
 
+	const [editData, setEditData] = useState<{
+		id: number;
+		name: string;
+		time: number;
+		soundId: number | null;
+		repeat?: Selectable<Schedules>["repeat"];
+	} | null>(null);
+	const [deleteId, setDeleteId] = useState<number | null>(null);
+
 	return (
-		<div className={cn("flex flex-1 flex-col gap-3", className)} {...props}>
-			{isPending ? (
-				<ScheduleListPending />
-			) : isError ? (
-				<ScheduleListError error={error.message} />
-			) : data.length === 0 ? (
-				<ScheduleListEmpty />
-			) : (
-				<>
-					{oneTimeSchedules && oneTimeSchedules.length > 0 && (
-						<OneTimeSection schedules={oneTimeSchedules} date={date} />
-					)}
-					{oneTimeSchedules &&
-						oneTimeSchedules.length > 0 &&
-						weeklySchedules &&
-						weeklySchedules.length > 0 && <Separator />}
-					{weeklySchedules?.map((schedule) => (
-						<ScheduleListItem
-							key={schedule.id}
-							id={schedule.id}
-							time={schedule.final_time}
-							name={schedule.name}
-							soundName={schedule.sound_name}
-							soundId={schedule.final_sound_id}
-							repeat={schedule.repeat}
-							scheduleDate={date}
-						/>
-					))}
-				</>
-			)}
-		</div>
+		<>
+			<div className={cn("flex flex-1 flex-col gap-3", className)} {...props}>
+				{isPending ? (
+					<ScheduleListPending />
+				) : isError ? (
+					<ScheduleListError error={error.message} />
+				) : data.length === 0 ? (
+					<ScheduleListEmpty />
+				) : (
+					<>
+						{oneTimeSchedules && oneTimeSchedules.length > 0 && (
+							<OneTimeSection
+								schedules={oneTimeSchedules}
+								date={date}
+								onEdit={(d) => setEditData(d)}
+								onDelete={(id) => setDeleteId(id)}
+							/>
+						)}
+						{oneTimeSchedules &&
+							oneTimeSchedules.length > 0 &&
+							weeklySchedules &&
+							weeklySchedules.length > 0 && <Separator />}
+						{weeklySchedules?.map((schedule) => (
+							<ScheduleListItem
+								key={schedule.id}
+								id={schedule.id}
+								time={schedule.final_time}
+								name={schedule.name}
+								soundName={schedule.sound_name}
+								soundId={schedule.final_sound_id}
+								repeat={schedule.repeat}
+								onEdit={() =>
+									setEditData({
+										id: schedule.id,
+										name: schedule.name,
+										time: schedule.final_time,
+										soundId: schedule.final_sound_id,
+										repeat: schedule.repeat,
+									})
+								}
+								onDelete={() => setDeleteId(schedule.id)}
+							/>
+						))}
+					</>
+				)}
+			</div>
+			<ScheduleEditDialog
+				data={editData}
+				scheduleDate={date}
+				onOpenChange={(open) => !open && setEditData(null)}
+			/>
+			<ScheduleDeleteDialog
+				id={deleteId}
+				scheduleDate={date}
+				onOpenChange={(open) => !open && setDeleteId(null)}
+			/>
+		</>
 	);
 };
 
 const OneTimeSection = ({
 	schedules,
 	date,
+	onEdit,
+	onDelete,
 }: {
 	schedules: {
 		id: number;
@@ -119,6 +155,13 @@ const OneTimeSection = ({
 		sound_name: string;
 	}[];
 	date: Date;
+	onEdit: (data: {
+		id: number;
+		name: string;
+		time: number;
+		soundId: number | null;
+	}) => void;
+	onDelete: (id: number) => void;
 }) => {
 	const [open, setOpen] = useState(true);
 
@@ -146,6 +189,15 @@ const OneTimeSection = ({
 						soundName={schedule.sound_name}
 						soundId={schedule.final_sound_id}
 						scheduleDate={date}
+						onEdit={() =>
+							onEdit({
+								id: schedule.id,
+								name: schedule.name,
+								time: schedule.final_time,
+								soundId: schedule.final_sound_id,
+							})
+						}
+						onDelete={() => onDelete(schedule.id)}
 					/>
 				))}
 		</div>
@@ -153,12 +205,12 @@ const OneTimeSection = ({
 };
 
 const OneTimeListItem = ({
-	id,
 	time,
 	name,
 	soundName,
-	soundId,
 	scheduleDate,
+	onEdit,
+	onDelete,
 }: {
 	id: number;
 	time: number;
@@ -166,6 +218,8 @@ const OneTimeListItem = ({
 	soundName: string;
 	soundId: number | null;
 	scheduleDate: Date;
+	onEdit: () => void;
+	onDelete: () => void;
 }) => {
 	return (
 		<Card className="group border-dashed">
@@ -188,15 +242,12 @@ const OneTimeListItem = ({
 					</div>
 				</div>
 				<div className="absolute right-0 hidden h-full items-center gap-3 bg-card mask-[linear-gradient(to_right,transparent,theme(--color-card)_2rem)] pr-4 pl-10 group-hover:flex [&_svg]:size-4!">
-					<ScheduleEditButton
-						id={id}
-						initialData={{ name, time, soundId }}
-						scheduleDate={scheduleDate}
-					/>
-					<ScheduleDeleteButton
-						id={id}
-						scheduleDate={scheduleDate}
-					/>
+					<Button variant="outline" size="icon" onClick={onEdit}>
+						<EditIcon />
+					</Button>
+					<Button variant="destructive-outline" size="icon" onClick={onDelete}>
+						<TrashIcon />
+					</Button>
 				</div>
 			</CardContent>
 		</Card>
@@ -204,13 +255,12 @@ const OneTimeListItem = ({
 };
 
 const ScheduleListItem = ({
-	id,
 	time,
 	name,
 	soundName,
-	soundId,
 	repeat,
-	scheduleDate,
+	onEdit,
+	onDelete,
 }: {
 	id: number;
 	time: number;
@@ -218,7 +268,8 @@ const ScheduleListItem = ({
 	soundName: string;
 	soundId: number | null;
 	repeat: Selectable<Schedules>["repeat"];
-	scheduleDate: Date;
+	onEdit: () => void;
+	onDelete: () => void;
 }) => {
 	return (
 		<Card className="group">
@@ -241,16 +292,12 @@ const ScheduleListItem = ({
 					</div>
 				</div>
 				<div className="absolute right-0 hidden h-full items-center gap-3 bg-card mask-[linear-gradient(to_right,transparent,theme(--color-card)_2rem)] pr-4 pl-10 group-hover:flex [&_svg]:size-4!">
-					<ScheduleEditButton
-						id={id}
-						initialData={{ name, time, soundId }}
-						repeat={repeat}
-						scheduleDate={scheduleDate}
-					/>
-					<ScheduleDeleteButton
-						id={id}
-						scheduleDate={scheduleDate}
-					/>
+					<Button variant="outline" size="icon" onClick={onEdit}>
+						<EditIcon />
+					</Button>
+					<Button variant="destructive-outline" size="icon" onClick={onDelete}>
+						<TrashIcon />
+					</Button>
 				</div>
 			</CardContent>
 		</Card>
@@ -262,36 +309,37 @@ const selectSounds = (sounds: { id: number; name: string }[]) => [
 	...sounds.map((s) => ({ label: s.name, value: String(s.id) })),
 ];
 
-const ScheduleEditButton = ({
-	id,
-	initialData,
-	repeat,
+const ScheduleEditDialog = ({
+	data,
 	scheduleDate,
+	onOpenChange,
 }: {
-	id: Selectable<Schedules>["id"];
-	initialData: {
+	data: {
+		id: number;
 		name: string;
 		time: number;
 		soundId: number | null;
-	};
-	repeat?: Selectable<Schedules>["repeat"];
+		repeat?: Selectable<Schedules>["repeat"];
+	} | null;
 	scheduleDate: Date;
+	onOpenChange: (open: boolean) => void;
 }) => {
-	const [open, setOpen] = useState(false);
-
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger render={<Button variant="outline" size="icon" />}>
-				<EditIcon />
-			</DialogTrigger>
+		<Dialog open={data !== null} onOpenChange={onOpenChange}>
 			<DialogPopup>
-				<ScheduleEditForm
-					id={id}
-					initialData={initialData}
-					repeat={repeat}
-					scheduleDate={scheduleDate}
-					onClose={() => setOpen(false)}
-				/>
+				{data && (
+					<ScheduleEditForm
+						id={data.id}
+						initialData={{
+							name: data.name,
+							time: data.time,
+							soundId: data.soundId,
+						}}
+						repeat={data.repeat}
+						scheduleDate={scheduleDate}
+						onClose={() => onOpenChange(false)}
+					/>
+				)}
 			</DialogPopup>
 		</Dialog>
 	);
@@ -490,30 +538,26 @@ const ScheduleEditForm = ({
 	);
 };
 
-const ScheduleDeleteButton = ({
+const ScheduleDeleteDialog = ({
 	id,
 	scheduleDate,
+	onOpenChange,
 }: {
-	id: Selectable<Schedules>["id"];
+	id: number | null;
 	scheduleDate: Date;
+	onOpenChange: (open: boolean) => void;
 }) => {
-	const [open, setOpen] = useState(false);
 	const queryClient = useQueryClient();
 
 	const { mutate } = useMutation(
 		services.schedule.mutation.deleteSchedule({
-			id,
+			id: id ?? 0,
 			date: format(scheduleDate, "yyyy-MM-dd"),
 		}),
 	);
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger
-				render={<Button variant="destructive-outline" size="icon" />}
-			>
-				<TrashIcon />
-			</DialogTrigger>
+		<Dialog open={id !== null} onOpenChange={onOpenChange}>
 			<DialogPopup>
 				<DialogHeader>
 					<DialogTitle>Are you sure?</DialogTitle>
@@ -522,7 +566,7 @@ const ScheduleDeleteButton = ({
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
-					<Button variant="ghost" onClick={() => setOpen(false)}>
+					<Button variant="ghost" onClick={() => onOpenChange(false)}>
 						Cancel
 					</Button>
 					<Button
@@ -531,7 +575,7 @@ const ScheduleDeleteButton = ({
 							mutate("all", {
 								onSuccess: () => {
 									queryClient.invalidateQueries({ queryKey: ["schedules"] });
-									setOpen(false);
+									onOpenChange(false);
 								},
 							});
 						}}

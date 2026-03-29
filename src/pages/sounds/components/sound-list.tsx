@@ -4,7 +4,6 @@ import { Button } from "@shared/components/ui/button";
 import { Card, CardContent } from "@shared/components/ui/card";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -12,7 +11,6 @@ import {
   DialogPanel,
   DialogPopup,
   DialogTitle,
-  DialogTrigger,
 } from "@shared/components/ui/dialog";
 import { Input } from "@shared/components/ui/input";
 import { Label } from "@shared/components/ui/label";
@@ -34,6 +32,14 @@ export const SoundList = ({
   const { search } = useSearchContext();
   const debouncedSearch = useDebounce(search, 250);
   const player = useSoundPlayer();
+  const [editingSound, setEditingSound] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [deletingSound, setDeletingSound] = useState<{
+    id: number;
+    fileName: string;
+  } | null>(null);
 
   const {
     data: sounds,
@@ -52,32 +58,50 @@ export const SoundList = ({
   if (!filteredSounds || filteredSounds.length === 0) return <SoundListEmpty />;
 
   return (
-    <div
-      className={cn("flex flex-col gap-3", className)}
-      {...props}
-    >
-      {filteredSounds.map((sound) => (
-        <SoundListItem
-          key={sound.id}
-          id={sound.id}
-          name={sound.name}
-          fileName={sound.file_name}
-          isCurrent={player.playingId === sound.id}
-          isPlaying={player.isPlaying}
-          currentTime={player.currentTime}
-          duration={player.duration}
-          isLoading={player.isLoading && player.playingId === sound.id}
-          onPlay={() => player.play(sound.id, sound.file_name)}
-          onPause={player.pause}
-          onSeek={player.seek}
-        />
-      ))}
-    </div>
+    <>
+      <div
+        className={cn("flex flex-col gap-3", className)}
+        {...props}
+      >
+        {filteredSounds.map((sound) => {
+          const isCurrent = player.playingId === sound.id;
+          return (
+            <SoundListItem
+              key={sound.id}
+              id={sound.id}
+              name={sound.name}
+              fileName={sound.file_name}
+              isCurrent={isCurrent}
+              isPlaying={isCurrent && player.isPlaying}
+              currentTime={isCurrent ? player.currentTime : 0}
+              duration={isCurrent ? player.duration : 0}
+              isLoading={isCurrent && player.isLoading}
+              onPlay={() => player.play(sound.id, sound.file_name)}
+              onPause={player.pause}
+              onSeek={player.seek}
+              onEdit={() =>
+                setEditingSound({ id: sound.id, name: sound.name })
+              }
+              onDelete={() =>
+                setDeletingSound({ id: sound.id, fileName: sound.file_name })
+              }
+            />
+          );
+        })}
+      </div>
+      <SoundEditDialog
+        data={editingSound}
+        onOpenChange={(open) => !open && setEditingSound(null)}
+      />
+      <SoundDeleteDialog
+        data={deletingSound}
+        onOpenChange={(open) => !open && setDeletingSound(null)}
+      />
+    </>
   );
 };
 
 const SoundListItem = ({
-  id,
   name,
   fileName,
   isCurrent,
@@ -88,6 +112,8 @@ const SoundListItem = ({
   onPlay,
   onPause,
   onSeek,
+  onEdit,
+  onDelete,
 }: {
   id: number;
   name: string;
@@ -100,6 +126,8 @@ const SoundListItem = ({
   onPlay: () => void;
   onPause: () => void;
   onSeek: (time: number) => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }) => {
   return (
     <Card
@@ -185,14 +213,27 @@ const SoundListItem = ({
 
           {!isCurrent && (
             <>
-              <SoundEditButton
-                id={id}
-                initialName={name}
-              />
-              <SoundDeleteButton
-                id={id}
-                fileName={fileName}
-              />
+              <Button
+                variant="ghost"
+                size="icon"
+                title="Edit Name"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+              >
+                <Edit />
+              </Button>
+              <Button
+                variant="destructive-outline"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+              >
+                <Trash />
+              </Button>
             </>
           )}
         </div>
@@ -292,8 +333,12 @@ const useSoundPlayer = () => {
         setIsPlaying(true);
       });
 
+      let rafId: number;
       audio.addEventListener("timeupdate", () => {
-        setCurrentTime(audio.currentTime);
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          setCurrentTime(audio.currentTime);
+        });
       });
 
       audio.addEventListener("ended", () => {
@@ -343,41 +388,30 @@ const useSoundPlayer = () => {
   };
 };
 
-const SoundEditButton = ({
-  id,
-  initialName,
+const SoundEditDialog = ({
+  data,
+  onOpenChange,
 }: {
-  id: number;
-  initialName: string;
+  data: { id: number; name: string } | null;
+  onOpenChange: (open: boolean) => void;
 }) => {
   const queryClient = useQueryClient();
-  const [name, setName] = useState(initialName);
-  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    if (data) setName(data.name);
+  }, [data]);
 
   const updateSound = useMutation({
     ...services.sound.mutation.updateSound,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sounds"] });
-      setOpen(false);
+      onOpenChange(false);
     },
   });
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={setOpen}
-    >
-      <DialogTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon"
-            title="Edit Name"
-          />
-        }
-      >
-        <Edit />
-      </DialogTrigger>
+    <Dialog open={data !== null} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Sound Name</DialogTitle>
@@ -387,27 +421,21 @@ const SoundEditButton = ({
         </DialogHeader>
         <DialogPanel>
           <div className="grid gap-2">
-            <Label htmlFor={`name-${id}`}>Display Name</Label>
+            <Label htmlFor="edit-sound-name">Display Name</Label>
             <Input
-              id={`name-${id}`}
+              id="edit-sound-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
         </DialogPanel>
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
             onClick={() => {
-              updateSound.mutate({
-                id,
-                name,
-              });
+              if (data) updateSound.mutate({ id: data.id, name });
             }}
           >
             Save Changes
@@ -418,42 +446,34 @@ const SoundEditButton = ({
   );
 };
 
-const SoundDeleteButton = ({
-  id,
-  fileName,
+const SoundDeleteDialog = ({
+  data,
+  onOpenChange,
 }: {
-  id: number;
-  fileName: string;
+  data: { id: number; fileName: string } | null;
+  onOpenChange: (open: boolean) => void;
 }) => {
   const queryClient = useQueryClient();
   const deleteSound = useMutation({
     ...services.sound.mutation.deleteSound,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sounds"] });
+      onOpenChange(false);
     },
   });
 
   const handleDelete = async () => {
-    deleteSound.mutate(id);
+    if (!data) return;
+    deleteSound.mutate(data.id);
     try {
-      await invoke("delete_sound_file", { filePath: fileName });
+      await invoke("delete_sound_file", { filePath: data.fileName });
     } catch (e) {
       console.error("Failed to delete file:", e);
     }
   };
 
   return (
-    <Dialog>
-      <DialogTrigger
-        render={
-          <Button
-            variant="destructive-outline"
-            size="icon"
-          />
-        }
-      >
-        <Trash />
-      </DialogTrigger>
+    <Dialog open={data !== null} onOpenChange={onOpenChange}>
       <DialogPopup>
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
@@ -462,19 +482,12 @@ const SoundDeleteButton = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
-          </DialogClose>
-          <DialogClose
-            render={
-              <Button
-                onClick={handleDelete}
-                variant="destructive"
-              />
-            }
-          >
+          </Button>
+          <Button onClick={handleDelete} variant="destructive">
             Delete
-          </DialogClose>
+          </Button>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

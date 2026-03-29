@@ -63,7 +63,7 @@ export const ScrollFade = ({
     >
       <div
         className={cn(
-          "will-change-opacity pointer-events-none sticky top-0 z-10 -mb-22 h-22 w-full transition-opacity duration-300",
+          "pointer-events-none sticky top-0 z-10 -mb-22 h-22 w-full transition-opacity duration-300",
           "bg-linear-to-b from-background to-transparent",
           scrollState.canScrollUp ? "opacity-100" : "opacity-0",
         )}
@@ -73,7 +73,7 @@ export const ScrollFade = ({
 
       <div
         className={cn(
-          "will-change-opacity pointer-events-none sticky bottom-0 z-10 -mt-22 h-22 w-full transition-opacity duration-300",
+          "pointer-events-none sticky bottom-0 z-10 -mt-22 h-22 w-full transition-opacity duration-300",
           "bg-linear-to-t from-background to-transparent",
           scrollState.canScrollDown ? "opacity-100" : "opacity-0",
         )}

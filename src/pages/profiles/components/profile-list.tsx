@@ -5,13 +5,11 @@ import { Button } from "@shared/components/ui/button";
 import { Card, CardContent } from "@shared/components/ui/card";
 import {
   Dialog,
-  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogPopup,
   DialogTitle,
-  DialogTrigger,
 } from "@shared/components/ui/dialog";
 import { Skeleton } from "@shared/components/ui/skeleton";
 import { useDebounce } from "@shared/lib/hooks";
@@ -19,7 +17,7 @@ import { services } from "@shared/lib/services";
 import { cn } from "@shared/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useSearchContext } from "../contexts/search-context";
 import { ProfileEditButton } from "./profile-edit-button";
 
@@ -42,21 +40,38 @@ export const ProfileList = ({
   if (isError) return <ProfileListError error={error.message} />;
   if (data.length === 0) return <ProfileListEmpty />;
 
+  const [deletingProfile, setDeletingProfile] = useState<{
+    id: number;
+    scheduleCount: number;
+  } | null>(null);
+
   return (
-    <div
-      className={cn("flex flex-col gap-3", className)}
-      {...props}
-    >
-      {data.map((profile) => (
-        <ProfileListItem
-          key={profile.id}
-          id={profile.id}
-          name={profile.name}
-          scheduleCount={Number(profile.schedule_count)}
-          isActive={profile.id === activeProfile.data}
-        />
-      ))}
-    </div>
+    <>
+      <div
+        className={cn("flex flex-col gap-3", className)}
+        {...props}
+      >
+        {data.map((profile) => (
+          <ProfileListItem
+            key={profile.id}
+            id={profile.id}
+            name={profile.name}
+            scheduleCount={Number(profile.schedule_count)}
+            isActive={profile.id === activeProfile.data}
+            onDelete={() =>
+              setDeletingProfile({
+                id: profile.id,
+                scheduleCount: Number(profile.schedule_count),
+              })
+            }
+          />
+        ))}
+      </div>
+      <ProfileDeleteDialog
+        data={deletingProfile}
+        onOpenChange={(open) => !open && setDeletingProfile(null)}
+      />
+    </>
   );
 };
 
@@ -65,11 +80,13 @@ const ProfileListItem = ({
   name,
   scheduleCount,
   isActive,
+  onDelete,
 }: {
   id: number;
   name: string;
   scheduleCount: number;
   isActive: boolean;
+  onDelete: () => void;
 }) => {
   return (
     <Card className="group">
@@ -95,74 +112,61 @@ const ProfileListItem = ({
             id={id}
             initialName={name}
           />
-          <ProfileDeleteButton
-            id={id}
-            scheduleCount={scheduleCount}
-            isActive={isActive}
-          />
+          {!isActive && (
+            <Button
+              variant="destructive-outline"
+              size="icon"
+              onClick={onDelete}
+            >
+              <TrashIcon />
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
   );
 };
 
-const ProfileDeleteButton = ({
-  id,
-  scheduleCount,
-  isActive,
+const ProfileDeleteDialog = ({
+  data,
+  onOpenChange,
 }: {
-  id: number;
-  scheduleCount: number;
-  isActive: boolean;
+  data: { id: number; scheduleCount: number } | null;
+  onOpenChange: (open: boolean) => void;
 }) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     ...services.profile.mutation.deleteProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      onOpenChange(false);
     },
   });
 
-  const handleDelete = useCallback(() => {
-    mutation.mutate(id);
-  }, [mutation, id]);
-
-  if (isActive) return null;
-
   return (
-    <Dialog>
-      <DialogTrigger
-        render={
-          <Button
-            variant="destructive-outline"
-            size="icon"
-          />
-        }
-      >
-        <TrashIcon />
-      </DialogTrigger>
+    <Dialog open={data !== null} onOpenChange={onOpenChange}>
       <DialogPopup>
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogDescription>
             You are about to delete this profile. This will also delete{" "}
-            <strong className="text-foreground">{scheduleCount}</strong>{" "}
+            <strong className="text-foreground">
+              {data?.scheduleCount ?? 0}
+            </strong>{" "}
             schedule
-            {scheduleCount === 1 ? "" : "s"} tied to it.
+            {data?.scheduleCount === 1 ? "" : "s"} tied to it.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button />}>Cancel</DialogClose>
-          <DialogClose
-            render={
-              <Button
-                onClick={handleDelete}
-                variant="destructive"
-              />
-            }
+          <Button onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              if (data) mutation.mutate(data.id);
+            }}
+            variant="destructive"
           >
             Delete
-          </DialogClose>
+          </Button>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

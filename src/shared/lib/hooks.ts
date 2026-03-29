@@ -33,15 +33,18 @@ export const useValidateForm = <T>(schema: z.Schema<T>) => {
 export const useTime = () => {
   const [time, setTime] = useState(new Date());
   useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval>;
     const delay = 1000 - new Date().getMilliseconds();
     const timeoutId = setTimeout(() => {
       setTime(new Date());
-      const intervalId = setInterval(() => {
+      intervalId = setInterval(() => {
         setTime(new Date());
       }, 1000);
-      return () => clearInterval(intervalId);
     }, delay);
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
   }, []);
   return time;
 };
