@@ -1,1 +1,0 @@
-ALTER TABLE profiles ADD COLUMN business_days TEXT NOT NULL DEFAULT '[1,2,3,4,5]';
