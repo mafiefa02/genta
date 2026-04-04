@@ -1,8 +1,7 @@
+import { Button } from "-/components/ui/button";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { useEffect, useState } from "react";
-
-import { Button } from "-/components/ui/button";
 
 /** Example component to test the functionality of the updater
  *  @link https://v2.tauri.app/plugin/updater/#checking-for-updates
