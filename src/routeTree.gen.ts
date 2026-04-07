@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as SoundsRouteImport } from "./routes/sounds"
+import { Route as SetupRouteImport } from "./routes/setup"
 import { Route as SettingsRouteImport } from "./routes/settings"
 import { Route as SchedulesRouteImport } from "./routes/schedules"
 import { Route as ProfilesRouteImport } from "./routes/profiles"
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from "./routes/index"
 const SoundsRoute = SoundsRouteImport.update({
   id: "/sounds",
   path: "/sounds",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetupRoute = SetupRouteImport.update({
+  id: "/setup",
+  path: "/setup",
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   "/profiles": typeof ProfilesRoute
   "/schedules": typeof SchedulesRoute
   "/settings": typeof SettingsRoute
+  "/setup": typeof SetupRoute
   "/sounds": typeof SoundsRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   "/profiles": typeof ProfilesRoute
   "/schedules": typeof SchedulesRoute
   "/settings": typeof SettingsRoute
+  "/setup": typeof SetupRoute
   "/sounds": typeof SoundsRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,28 @@ export interface FileRoutesById {
   "/profiles": typeof ProfilesRoute
   "/schedules": typeof SchedulesRoute
   "/settings": typeof SettingsRoute
+  "/setup": typeof SetupRoute
   "/sounds": typeof SoundsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/profiles" | "/schedules" | "/settings" | "/sounds"
+  fullPaths:
+    | "/"
+    | "/profiles"
+    | "/schedules"
+    | "/settings"
+    | "/setup"
+    | "/sounds"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/profiles" | "/schedules" | "/settings" | "/sounds"
-  id: "__root__" | "/" | "/profiles" | "/schedules" | "/settings" | "/sounds"
+  to: "/" | "/profiles" | "/schedules" | "/settings" | "/setup" | "/sounds"
+  id:
+    | "__root__"
+    | "/"
+    | "/profiles"
+    | "/schedules"
+    | "/settings"
+    | "/setup"
+    | "/sounds"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +98,7 @@ export interface RootRouteChildren {
   ProfilesRoute: typeof ProfilesRoute
   SchedulesRoute: typeof SchedulesRoute
   SettingsRoute: typeof SettingsRoute
+  SetupRoute: typeof SetupRoute
   SoundsRoute: typeof SoundsRoute
 }
 
@@ -86,6 +109,13 @@ declare module "@tanstack/react-router" {
       path: "/sounds"
       fullPath: "/sounds"
       preLoaderRoute: typeof SoundsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/setup": {
+      id: "/setup"
+      path: "/setup"
+      fullPath: "/setup"
+      preLoaderRoute: typeof SetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/settings": {
@@ -124,6 +154,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfilesRoute: ProfilesRoute,
   SchedulesRoute: SchedulesRoute,
   SettingsRoute: SettingsRoute,
+  SetupRoute: SetupRoute,
   SoundsRoute: SoundsRoute,
 }
 export const routeTree = rootRouteImport

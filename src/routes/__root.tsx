@@ -1,5 +1,4 @@
 import { AppSidebar } from "-/components/app-sidebar";
-import { ThemeProvider } from "-/components/theme-provider";
 import { SidebarProvider } from "-/components/ui/sidebar";
 import { IconLoader } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
@@ -15,7 +14,7 @@ export const Route = createRootRoute({
 
 function Root() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="genta-ui-theme">
+    <>
       <div className="flex h-dvh">
         <SidebarProvider>
           <AppSidebar />
@@ -37,14 +36,14 @@ function Root() {
           },
         ]}
       />
-    </ThemeProvider>
+    </>
   );
 }
 
 function RootLoading() {
   return (
     <main className="flex h-dvh w-dvw items-center justify-center">
-      <IconLoader />
+      <IconLoader className="animate-spin" />
     </main>
   );
 }
