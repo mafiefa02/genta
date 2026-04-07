@@ -3,5 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({ component: Index });
 
 function Index() {
-  return <p className="font-bold">Hello!</p>;
+  return (
+    <div className="flex flex-1 flex-col">
+      <p>Hello!</p>
+    </div>
+  );
 }
