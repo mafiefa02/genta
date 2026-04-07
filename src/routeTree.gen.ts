@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root"
+import { Route as SoundsRouteImport } from "./routes/sounds"
+import { Route as SettingsRouteImport } from "./routes/settings"
+import { Route as SchedulesRouteImport } from "./routes/schedules"
+import { Route as ProfilesRouteImport } from "./routes/profiles"
 import { Route as IndexRouteImport } from "./routes/index"
 
+const SoundsRoute = SoundsRouteImport.update({
+  id: "/sounds",
+  path: "/sounds",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: "/settings",
+  path: "/settings",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SchedulesRoute = SchedulesRouteImport.update({
+  id: "/schedules",
+  path: "/schedules",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfilesRoute = ProfilesRouteImport.update({
+  id: "/profiles",
+  path: "/profiles",
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
@@ -19,28 +43,72 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/profiles": typeof ProfilesRoute
+  "/schedules": typeof SchedulesRoute
+  "/settings": typeof SettingsRoute
+  "/sounds": typeof SoundsRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/profiles": typeof ProfilesRoute
+  "/schedules": typeof SchedulesRoute
+  "/settings": typeof SettingsRoute
+  "/sounds": typeof SoundsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
+  "/profiles": typeof ProfilesRoute
+  "/schedules": typeof SchedulesRoute
+  "/settings": typeof SettingsRoute
+  "/sounds": typeof SoundsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/"
+  fullPaths: "/" | "/profiles" | "/schedules" | "/settings" | "/sounds"
   fileRoutesByTo: FileRoutesByTo
-  to: "/"
-  id: "__root__" | "/"
+  to: "/" | "/profiles" | "/schedules" | "/settings" | "/sounds"
+  id: "__root__" | "/" | "/profiles" | "/schedules" | "/settings" | "/sounds"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProfilesRoute: typeof ProfilesRoute
+  SchedulesRoute: typeof SchedulesRoute
+  SettingsRoute: typeof SettingsRoute
+  SoundsRoute: typeof SoundsRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/sounds": {
+      id: "/sounds"
+      path: "/sounds"
+      fullPath: "/sounds"
+      preLoaderRoute: typeof SoundsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/settings": {
+      id: "/settings"
+      path: "/settings"
+      fullPath: "/settings"
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/schedules": {
+      id: "/schedules"
+      path: "/schedules"
+      fullPath: "/schedules"
+      preLoaderRoute: typeof SchedulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/profiles": {
+      id: "/profiles"
+      path: "/profiles"
+      fullPath: "/profiles"
+      preLoaderRoute: typeof ProfilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/": {
       id: "/"
       path: "/"
@@ -53,6 +121,10 @@ declare module "@tanstack/react-router" {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProfilesRoute: ProfilesRoute,
+  SchedulesRoute: SchedulesRoute,
+  SettingsRoute: SettingsRoute,
+  SoundsRoute: SoundsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
