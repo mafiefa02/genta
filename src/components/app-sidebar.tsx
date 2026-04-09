@@ -43,6 +43,7 @@ import {
   IconCalendarUser,
   IconCheck,
   IconClock,
+  IconHome,
   IconMenu2,
   IconMessage2Star,
   IconMusic,
@@ -54,6 +55,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 
 const SIDEBAR_MENU = [
+  { label: "Home", icon: IconHome, path: "/" },
   { label: "Schedules", icon: IconClock, path: "/schedules" },
   { label: "Schedule Presets", icon: IconCalendarUser, path: "/presets" },
   { label: "Custom Sounds", icon: IconMusic, path: "/sounds" },
@@ -194,7 +196,7 @@ const PresetSwitcher = () => {
 
 const NavigationMenu = ({ menus }: { menus: typeof SIDEBAR_MENU }) => {
   const location = useLocation();
-  const isMenuActive = (pathname: string) => location.pathname.startsWith(pathname);
+  const isMenuActive = (pathname: string) => location.pathname === pathname;
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Genta&apos;s Menu</SidebarGroupLabel>
