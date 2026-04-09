@@ -29,7 +29,7 @@ function RouteComponent() {
   const hasPresets = presets.length > 0;
 
   return (
-    <main className="from-backgroun relative flex h-dvh flex-col overflow-hidden bg-linear-to-b via-background to-primary/5">
+    <main className="relative flex h-dvh flex-col overflow-hidden bg-linear-to-b from-background via-background to-primary/5">
       <header className="relative z-10 flex items-center justify-center px-6 py-4">
         <span className="text-lg font-semibold tracking-tight text-primary">Genta</span>
       </header>
