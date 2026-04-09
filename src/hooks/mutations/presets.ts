@@ -1,6 +1,7 @@
+import type { UseMutationOptions } from "@tanstack/react-query";
+
 import { setConfig } from "-/lib/config-store";
 import { getDb } from "-/lib/db";
-import type { UseMutationOptions } from "@tanstack/react-query";
 
 type MutationOptions<TData, TVariables> = Omit<
   UseMutationOptions<TData, Error, TVariables>,
