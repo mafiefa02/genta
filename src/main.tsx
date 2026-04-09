@@ -9,21 +9,15 @@ import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-const getRouter = () => {
-  const queryClient = new QueryClient();
-  const router = createRouter({
-    routeTree,
-    context: { queryClient },
-    defaultPreload: "intent",
-  });
-
-  setupRouterSsrQueryIntegration({ router, queryClient });
-
-  return router;
-};
-
-const router = getRouter();
 const queryClient = new QueryClient();
+
+const router = createRouter({
+  routeTree,
+  context: { queryClient },
+  defaultPreload: "intent",
+});
+
+setupRouterSsrQueryIntegration({ router, queryClient, wrapQueryClient: false });
 
 declare module "@tanstack/react-router" {
   interface Register {

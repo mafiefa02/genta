@@ -1,14 +1,33 @@
+import type { SchedulePreset } from "-/lib/models";
+
 import bellAsset from "-/assets/bell3d.png";
 import { Button } from "-/components/ui/button";
 import { Input } from "-/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "-/components/ui/select";
+import { presetsMutations } from "-/hooks/mutations/presets";
+import { presetsQueries } from "-/hooks/queries/presets";
 import { IconArrowRight, IconBell, IconCalendar, IconClock } from "@tabler/icons-react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useState } from "react";
 
 export const Route = createFileRoute("/setup")({
   component: RouteComponent,
+  loader: ({ context }) => {
+    return context.queryClient.ensureQueryData(presetsQueries.list());
+  },
 });
 
 function RouteComponent() {
+  const { data: presets } = useSuspenseQuery(presetsQueries.list());
+  const hasPresets = presets.length > 0;
+
   return (
     <main className="from-backgroun relative flex h-dvh flex-col overflow-hidden bg-linear-to-b via-background to-primary/5">
       <header className="relative z-10 flex items-center justify-center px-6 py-4">
@@ -30,20 +49,12 @@ function RouteComponent() {
             Selamat Datang
           </h1>
           <p className="text-base text-pretty text-muted-foreground">
-            Buat profil jadwal pertama Anda untuk mulai menggunakan Genta untuk mengatur jadwal bel
+            Atur profil jadwal pertama Anda untuk mulai menggunakan Genta untuk mengatur jadwal bel
             sekolah
           </p>
         </div>
 
-        <div className="mb-auto flex w-full max-w-sm flex-col gap-3">
-          <div className="flex gap-2">
-            <Input id="profile-name" type="text" placeholder="cth. Jadwal Reguler" />
-            <Button>
-              Mulai
-              <IconArrowRight />
-            </Button>
-          </div>
-        </div>
+        {hasPresets ? <SelectPresetControl presets={presets} /> : <CreatePresetControl />}
 
         <div className="mt-12 flex flex-col justify-center gap-4">
           <span className="text-center text-sm text-muted-foreground">
@@ -68,3 +79,77 @@ function RouteComponent() {
     </main>
   );
 }
+
+const CreatePresetControl = () => {
+  const [name, setName] = useState("");
+  const router = useRouter();
+  const { mutate, isPending } = useMutation(
+    presetsMutations.create({
+      onSuccess: () => router.navigate({ to: "/" }),
+    }),
+  );
+
+  const handleSubmit = () => {
+    const trimmed = name.trim();
+    if (!trimmed || isPending) return;
+    mutate(trimmed);
+  };
+
+  return (
+    <div className="mb-auto flex w-full max-w-sm flex-col gap-3">
+      <div className="flex gap-2">
+        <Input
+          id="profile-name"
+          type="text"
+          placeholder="cth. Jadwal Reguler"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+          disabled={isPending}
+        />
+        <Button onClick={handleSubmit} disabled={!name.trim() || isPending}>
+          Mulai
+          <IconArrowRight />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const SelectPresetControl = ({ presets }: { presets: SchedulePreset[] }) => {
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const router = useRouter();
+  const { mutate, isPending } = useMutation(
+    presetsMutations.activate({
+      onSuccess: () => router.navigate({ to: "/" }),
+    }),
+  );
+
+  const handleSubmit = () => {
+    if (selectedId == null || isPending) return;
+    mutate(selectedId);
+  };
+
+  return (
+    <div className="mb-auto flex w-full max-w-sm flex-col gap-3">
+      <div className="flex gap-2">
+        <Select value={selectedId} onValueChange={(val: number | null) => setSelectedId(val)}>
+          <SelectTrigger className="flex-1">
+            <SelectValue placeholder="Pilih profil..." />
+          </SelectTrigger>
+          <SelectContent>
+            {presets.map((preset) => (
+              <SelectItem key={preset.id} value={preset.id}>
+                {preset.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button onClick={handleSubmit} disabled={selectedId == null || isPending}>
+          Mulai
+          <IconArrowRight />
+        </Button>
+      </div>
+    </div>
+  );
+};
