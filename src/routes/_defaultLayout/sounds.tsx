@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/sounds")({
+export const Route = createFileRoute("/_defaultLayout/sounds")({
   component: RouteComponent,
 });
 
