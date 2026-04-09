@@ -13,8 +13,10 @@ export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
     if (location.pathname === "/setup") return;
     const db = await getDb();
-    const preset = (await db.select("SELECT * FROM schedule_preset")) as unknown[];
-    if (preset.length === 0) {
+    const [result] = (await db.select("SELECT COUNT(*) as count FROM schedule_preset")) as {
+      count: number;
+    }[];
+    if (result.count === 0) {
       throw redirect({ to: "/setup" });
     }
   },
