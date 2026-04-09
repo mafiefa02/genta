@@ -143,7 +143,7 @@ const PresetSwitcher = () => {
                 </div>
               </TooltipTrigger>
             </Tooltip>
-            <DropdownMenuContent>
+            <DropdownMenuContent side="right">
               <DropdownMenuGroup>
                 <DropdownMenuLabel className="text-xs text-muted-foreground">
                   Presets
@@ -235,7 +235,7 @@ const Footer = () => {
             <IconMenu2 />
             <span>Preferences</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent side="right">
             <DropdownMenuGroup>
               <DropdownMenuLabel>Appearance</DropdownMenuLabel>
               <SidebarThemeToggle />
