@@ -35,7 +35,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "-/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "-/components/ui/tooltip";
 import { presetsMutations } from "-/hooks/mutations/presets";
 import { configQueries } from "-/hooks/queries/config";
 import { presetsQueries } from "-/hooks/queries/presets";
@@ -80,6 +82,7 @@ export const AppSidebar = () => {
 };
 
 const PresetSwitcher = () => {
+  const { isMobile, state } = useSidebar();
   const { data: presets } = useQuery(presetsQueries.list());
   const { data: activePresetId } = useQuery(configQueries.activePresetId());
   const queryClient = useQueryClient();
@@ -122,19 +125,24 @@ const PresetSwitcher = () => {
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
-              <Avatar>
-                <AvatarFallback>
-                  <IconMessage2Star />
-                </AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activePreset.name}</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {activePreset.description ?? "Schedule preset"}
-                </span>
-              </div>
-            </DropdownMenuTrigger>
+            <Tooltip disabled={isMobile || state === "expanded"}>
+              <TooltipContent side="right">Change preset</TooltipContent>
+              <TooltipTrigger
+                render={<DropdownMenuTrigger render={<SidebarMenuButton size="lg" />} />}
+              >
+                <Avatar>
+                  <AvatarFallback>
+                    <IconMessage2Star />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{activePreset.name}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {activePreset.description ?? "Schedule preset"}
+                  </span>
+                </div>
+              </TooltipTrigger>
+            </Tooltip>
             <DropdownMenuContent>
               <DropdownMenuGroup>
                 <DropdownMenuLabel className="text-xs text-muted-foreground">
