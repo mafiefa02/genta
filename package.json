@@ -41,6 +41,7 @@
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.6.0",
     "@tanstack/react-devtools": "^0.10.1",
+    "@tanstack/react-router-ssr-query": "^1.166.10",
     "@tanstack/router-plugin": "^1.167.12",
     "@tauri-apps/cli": "^2",
     "@types/node": "^25.5.0",
