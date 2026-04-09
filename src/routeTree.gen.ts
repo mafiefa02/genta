@@ -15,7 +15,7 @@ import { Route as DefaultLayoutIndexRouteImport } from "./routes/_defaultLayout/
 import { Route as DefaultLayoutSoundsRouteImport } from "./routes/_defaultLayout/sounds"
 import { Route as DefaultLayoutSettingsRouteImport } from "./routes/_defaultLayout/settings"
 import { Route as DefaultLayoutSchedulesRouteImport } from "./routes/_defaultLayout/schedules"
-import { Route as DefaultLayoutProfilesRouteImport } from "./routes/_defaultLayout/profiles"
+import { Route as DefaultLayoutPresetsRouteImport } from "./routes/_defaultLayout/presets"
 
 const SetupRoute = SetupRouteImport.update({
   id: "/setup",
@@ -46,23 +46,23 @@ const DefaultLayoutSchedulesRoute = DefaultLayoutSchedulesRouteImport.update({
   path: "/schedules",
   getParentRoute: () => DefaultLayoutRouteRoute,
 } as any)
-const DefaultLayoutProfilesRoute = DefaultLayoutProfilesRouteImport.update({
-  id: "/profiles",
-  path: "/profiles",
+const DefaultLayoutPresetsRoute = DefaultLayoutPresetsRouteImport.update({
+  id: "/presets",
+  path: "/presets",
   getParentRoute: () => DefaultLayoutRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof DefaultLayoutIndexRoute
   "/setup": typeof SetupRoute
-  "/profiles": typeof DefaultLayoutProfilesRoute
+  "/presets": typeof DefaultLayoutPresetsRoute
   "/schedules": typeof DefaultLayoutSchedulesRoute
   "/settings": typeof DefaultLayoutSettingsRoute
   "/sounds": typeof DefaultLayoutSoundsRoute
 }
 export interface FileRoutesByTo {
   "/setup": typeof SetupRoute
-  "/profiles": typeof DefaultLayoutProfilesRoute
+  "/presets": typeof DefaultLayoutPresetsRoute
   "/schedules": typeof DefaultLayoutSchedulesRoute
   "/settings": typeof DefaultLayoutSettingsRoute
   "/sounds": typeof DefaultLayoutSoundsRoute
@@ -72,7 +72,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/_defaultLayout": typeof DefaultLayoutRouteRouteWithChildren
   "/setup": typeof SetupRoute
-  "/_defaultLayout/profiles": typeof DefaultLayoutProfilesRoute
+  "/_defaultLayout/presets": typeof DefaultLayoutPresetsRoute
   "/_defaultLayout/schedules": typeof DefaultLayoutSchedulesRoute
   "/_defaultLayout/settings": typeof DefaultLayoutSettingsRoute
   "/_defaultLayout/sounds": typeof DefaultLayoutSoundsRoute
@@ -83,17 +83,17 @@ export interface FileRouteTypes {
   fullPaths:
     | "/"
     | "/setup"
-    | "/profiles"
+    | "/presets"
     | "/schedules"
     | "/settings"
     | "/sounds"
   fileRoutesByTo: FileRoutesByTo
-  to: "/setup" | "/profiles" | "/schedules" | "/settings" | "/sounds" | "/"
+  to: "/setup" | "/presets" | "/schedules" | "/settings" | "/sounds" | "/"
   id:
     | "__root__"
     | "/_defaultLayout"
     | "/setup"
-    | "/_defaultLayout/profiles"
+    | "/_defaultLayout/presets"
     | "/_defaultLayout/schedules"
     | "/_defaultLayout/settings"
     | "/_defaultLayout/sounds"
@@ -149,18 +149,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DefaultLayoutSchedulesRouteImport
       parentRoute: typeof DefaultLayoutRouteRoute
     }
-    "/_defaultLayout/profiles": {
-      id: "/_defaultLayout/profiles"
-      path: "/profiles"
-      fullPath: "/profiles"
-      preLoaderRoute: typeof DefaultLayoutProfilesRouteImport
+    "/_defaultLayout/presets": {
+      id: "/_defaultLayout/presets"
+      path: "/presets"
+      fullPath: "/presets"
+      preLoaderRoute: typeof DefaultLayoutPresetsRouteImport
       parentRoute: typeof DefaultLayoutRouteRoute
     }
   }
 }
 
 interface DefaultLayoutRouteRouteChildren {
-  DefaultLayoutProfilesRoute: typeof DefaultLayoutProfilesRoute
+  DefaultLayoutPresetsRoute: typeof DefaultLayoutPresetsRoute
   DefaultLayoutSchedulesRoute: typeof DefaultLayoutSchedulesRoute
   DefaultLayoutSettingsRoute: typeof DefaultLayoutSettingsRoute
   DefaultLayoutSoundsRoute: typeof DefaultLayoutSoundsRoute
@@ -168,7 +168,7 @@ interface DefaultLayoutRouteRouteChildren {
 }
 
 const DefaultLayoutRouteRouteChildren: DefaultLayoutRouteRouteChildren = {
-  DefaultLayoutProfilesRoute: DefaultLayoutProfilesRoute,
+  DefaultLayoutPresetsRoute: DefaultLayoutPresetsRoute,
   DefaultLayoutSchedulesRoute: DefaultLayoutSchedulesRoute,
   DefaultLayoutSettingsRoute: DefaultLayoutSettingsRoute,
   DefaultLayoutSoundsRoute: DefaultLayoutSoundsRoute,
