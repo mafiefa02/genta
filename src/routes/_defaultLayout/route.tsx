@@ -1,3 +1,4 @@
+import { AppHeader } from "-/components/app-header";
 import { AppSidebar } from "-/components/app-sidebar";
 import { SidebarProvider } from "-/components/ui/sidebar";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
@@ -11,9 +12,12 @@ function RouteComponent() {
     <div className="flex h-dvh">
       <SidebarProvider>
         <AppSidebar />
-        <main className="content px-4 py-3">
-          <Outlet />
-        </main>
+        <div className="flex flex-1 flex-col">
+          <AppHeader />
+          <main className="content px-4 pb-3">
+            <Outlet />
+          </main>
+        </div>
       </SidebarProvider>
     </div>
   );

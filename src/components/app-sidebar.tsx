@@ -57,11 +57,11 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 
 const SIDEBAR_MENU = [
-  { label: "Home", icon: IconHome, path: "/" },
-  { label: "Schedules", icon: IconClock, path: "/schedules" },
-  { label: "Schedule Presets", icon: IconCalendarUser, path: "/presets" },
-  { label: "Custom Sounds", icon: IconMusic, path: "/sounds" },
-  { label: "Settings", icon: IconSettings, path: "/settings" },
+  { label: "Beranda", icon: IconHome, path: "/" },
+  { label: "Jadwal", icon: IconClock, path: "/schedules" },
+  { label: "Preset Jadwal", icon: IconCalendarUser, path: "/presets" },
+  { label: "Suara Kustom", icon: IconMusic, path: "/sounds" },
+  { label: "Pengaturan", icon: IconSettings, path: "/settings" },
 ];
 
 export const AppSidebar = () => {
@@ -138,7 +138,7 @@ const PresetSwitcher = () => {
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{activePreset.name}</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {activePreset.description ?? "Schedule preset"}
+                    {activePreset.description ?? "Preset jadwal"}
                   </span>
                 </div>
               </TooltipTrigger>
@@ -146,7 +146,7 @@ const PresetSwitcher = () => {
             <DropdownMenuContent side="right">
               <DropdownMenuGroup>
                 <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  Presets
+                  Preset jadwal
                 </DropdownMenuLabel>
                 {presets.map((preset) => (
                   <DropdownMenuItem
@@ -170,7 +170,7 @@ const PresetSwitcher = () => {
               <DropdownMenuGroup>
                 <DropdownMenuItem onClick={() => setDialogOpen(true)}>
                   <IconPlus className="size-4" />
-                  <span>Create a new preset</span>
+                  <span>Buat preset baru</span>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
@@ -181,8 +181,8 @@ const PresetSwitcher = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create a new profile</DialogTitle>
-            <DialogDescription>Enter a name for your new schedule profile.</DialogDescription>
+            <DialogTitle>Preset Baru</DialogTitle>
+            <DialogDescription>Masukkan nama untuk preset baru yang akan dibuat</DialogDescription>
           </DialogHeader>
           <Input
             placeholder="cth. Jadwal Reguler"
@@ -193,7 +193,7 @@ const PresetSwitcher = () => {
           />
           <DialogFooter>
             <Button onClick={handleCreate} disabled={!newName.trim() || isCreating}>
-              Create
+              Buat preset
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -207,7 +207,7 @@ const NavigationMenu = ({ menus }: { menus: typeof SIDEBAR_MENU }) => {
   const isMenuActive = (pathname: string) => location.pathname === pathname;
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Genta&apos;s Menu</SidebarGroupLabel>
+      <SidebarGroupLabel>Navigasi</SidebarGroupLabel>
       <SidebarMenu>
         {menus.map((menu) => (
           <SidebarMenuItem key={menu.path}>
@@ -233,11 +233,11 @@ const Footer = () => {
         <DropdownMenu>
           <DropdownMenuTrigger render={<SidebarMenuButton />}>
             <IconMenu2 />
-            <span>Preferences</span>
+            <span>Preferensi</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="right">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+              <DropdownMenuLabel>Tampilan</DropdownMenuLabel>
               <SidebarThemeToggle />
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -247,18 +247,22 @@ const Footer = () => {
   );
 };
 
-const APP_THEMES = ["dark", "light", "system"] as const;
+const APP_THEMES = [
+  { id: "dark", label: "Gelap" },
+  { id: "light", label: "Terang" },
+  { id: "system", label: "Sistem" },
+] as const;
 const SidebarThemeToggle = () => {
   const { theme: activeTheme, setTheme: setActiveTheme } = useTheme();
   return (
     <DropdownMenuSub>
-      <DropdownMenuSubTrigger>Theme</DropdownMenuSubTrigger>
+      <DropdownMenuSubTrigger>Tema</DropdownMenuSubTrigger>
       <DropdownMenuPortal>
         <DropdownMenuSubContent>
           {APP_THEMES.map((theme) => (
-            <DropdownMenuItem onClick={() => setActiveTheme(theme)} key={theme}>
-              {theme.charAt(0).toUpperCase() + theme.slice(1)}
-              {theme === activeTheme && (
+            <DropdownMenuItem onClick={() => setActiveTheme(theme.id)} key={theme.id}>
+              {theme.label}
+              {theme.id === activeTheme && (
                 <DropdownMenuShortcut>
                   <IconCheck />
                 </DropdownMenuShortcut>
