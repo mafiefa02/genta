@@ -8,81 +8,87 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as DefaultLayoutIndexRouteImport } from "./routes/_defaultLayout/index";
-import { Route as DefaultLayoutProfilesRouteImport } from "./routes/_defaultLayout/profiles";
-import { Route as DefaultLayoutRouteRouteImport } from "./routes/_defaultLayout/route";
-import { Route as DefaultLayoutSchedulesRouteImport } from "./routes/_defaultLayout/schedules";
-import { Route as DefaultLayoutSettingsRouteImport } from "./routes/_defaultLayout/settings";
-import { Route as DefaultLayoutSoundsRouteImport } from "./routes/_defaultLayout/sounds";
-import { Route as SetupRouteImport } from "./routes/setup";
+import { Route as rootRouteImport } from "./routes/__root"
+import { Route as SetupRouteImport } from "./routes/setup"
+import { Route as DefaultLayoutRouteRouteImport } from "./routes/_defaultLayout/route"
+import { Route as DefaultLayoutIndexRouteImport } from "./routes/_defaultLayout/index"
+import { Route as DefaultLayoutSoundsRouteImport } from "./routes/_defaultLayout/sounds"
+import { Route as DefaultLayoutSettingsRouteImport } from "./routes/_defaultLayout/settings"
+import { Route as DefaultLayoutSchedulesRouteImport } from "./routes/_defaultLayout/schedules"
+import { Route as DefaultLayoutProfilesRouteImport } from "./routes/_defaultLayout/profiles"
 
 const SetupRoute = SetupRouteImport.update({
   id: "/setup",
   path: "/setup",
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DefaultLayoutRouteRoute = DefaultLayoutRouteRouteImport.update({
   id: "/_defaultLayout",
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DefaultLayoutIndexRoute = DefaultLayoutIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => DefaultLayoutRouteRoute,
-} as any);
+} as any)
 const DefaultLayoutSoundsRoute = DefaultLayoutSoundsRouteImport.update({
   id: "/sounds",
   path: "/sounds",
   getParentRoute: () => DefaultLayoutRouteRoute,
-} as any);
+} as any)
 const DefaultLayoutSettingsRoute = DefaultLayoutSettingsRouteImport.update({
   id: "/settings",
   path: "/settings",
   getParentRoute: () => DefaultLayoutRouteRoute,
-} as any);
+} as any)
 const DefaultLayoutSchedulesRoute = DefaultLayoutSchedulesRouteImport.update({
   id: "/schedules",
   path: "/schedules",
   getParentRoute: () => DefaultLayoutRouteRoute,
-} as any);
+} as any)
 const DefaultLayoutProfilesRoute = DefaultLayoutProfilesRouteImport.update({
   id: "/profiles",
   path: "/profiles",
   getParentRoute: () => DefaultLayoutRouteRoute,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof DefaultLayoutIndexRoute;
-  "/setup": typeof SetupRoute;
-  "/profiles": typeof DefaultLayoutProfilesRoute;
-  "/schedules": typeof DefaultLayoutSchedulesRoute;
-  "/settings": typeof DefaultLayoutSettingsRoute;
-  "/sounds": typeof DefaultLayoutSoundsRoute;
+  "/": typeof DefaultLayoutIndexRoute
+  "/setup": typeof SetupRoute
+  "/profiles": typeof DefaultLayoutProfilesRoute
+  "/schedules": typeof DefaultLayoutSchedulesRoute
+  "/settings": typeof DefaultLayoutSettingsRoute
+  "/sounds": typeof DefaultLayoutSoundsRoute
 }
 export interface FileRoutesByTo {
-  "/setup": typeof SetupRoute;
-  "/profiles": typeof DefaultLayoutProfilesRoute;
-  "/schedules": typeof DefaultLayoutSchedulesRoute;
-  "/settings": typeof DefaultLayoutSettingsRoute;
-  "/sounds": typeof DefaultLayoutSoundsRoute;
-  "/": typeof DefaultLayoutIndexRoute;
+  "/setup": typeof SetupRoute
+  "/profiles": typeof DefaultLayoutProfilesRoute
+  "/schedules": typeof DefaultLayoutSchedulesRoute
+  "/settings": typeof DefaultLayoutSettingsRoute
+  "/sounds": typeof DefaultLayoutSoundsRoute
+  "/": typeof DefaultLayoutIndexRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/_defaultLayout": typeof DefaultLayoutRouteRouteWithChildren;
-  "/setup": typeof SetupRoute;
-  "/_defaultLayout/profiles": typeof DefaultLayoutProfilesRoute;
-  "/_defaultLayout/schedules": typeof DefaultLayoutSchedulesRoute;
-  "/_defaultLayout/settings": typeof DefaultLayoutSettingsRoute;
-  "/_defaultLayout/sounds": typeof DefaultLayoutSoundsRoute;
-  "/_defaultLayout/": typeof DefaultLayoutIndexRoute;
+  __root__: typeof rootRouteImport
+  "/_defaultLayout": typeof DefaultLayoutRouteRouteWithChildren
+  "/setup": typeof SetupRoute
+  "/_defaultLayout/profiles": typeof DefaultLayoutProfilesRoute
+  "/_defaultLayout/schedules": typeof DefaultLayoutSchedulesRoute
+  "/_defaultLayout/settings": typeof DefaultLayoutSettingsRoute
+  "/_defaultLayout/sounds": typeof DefaultLayoutSoundsRoute
+  "/_defaultLayout/": typeof DefaultLayoutIndexRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/setup" | "/profiles" | "/schedules" | "/settings" | "/sounds";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/setup" | "/profiles" | "/schedules" | "/settings" | "/sounds" | "/";
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | "/"
+    | "/setup"
+    | "/profiles"
+    | "/schedules"
+    | "/settings"
+    | "/sounds"
+  fileRoutesByTo: FileRoutesByTo
+  to: "/setup" | "/profiles" | "/schedules" | "/settings" | "/sounds" | "/"
   id:
     | "__root__"
     | "/_defaultLayout"
@@ -91,74 +97,74 @@ export interface FileRouteTypes {
     | "/_defaultLayout/schedules"
     | "/_defaultLayout/settings"
     | "/_defaultLayout/sounds"
-    | "/_defaultLayout/";
-  fileRoutesById: FileRoutesById;
+    | "/_defaultLayout/"
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  DefaultLayoutRouteRoute: typeof DefaultLayoutRouteRouteWithChildren;
-  SetupRoute: typeof SetupRoute;
+  DefaultLayoutRouteRoute: typeof DefaultLayoutRouteRouteWithChildren
+  SetupRoute: typeof SetupRoute
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
     "/setup": {
-      id: "/setup";
-      path: "/setup";
-      fullPath: "/setup";
-      preLoaderRoute: typeof SetupRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: "/setup"
+      path: "/setup"
+      fullPath: "/setup"
+      preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/_defaultLayout": {
-      id: "/_defaultLayout";
-      path: "";
-      fullPath: "/";
-      preLoaderRoute: typeof DefaultLayoutRouteRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+      id: "/_defaultLayout"
+      path: ""
+      fullPath: "/"
+      preLoaderRoute: typeof DefaultLayoutRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     "/_defaultLayout/": {
-      id: "/_defaultLayout/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof DefaultLayoutIndexRouteImport;
-      parentRoute: typeof DefaultLayoutRouteRoute;
-    };
+      id: "/_defaultLayout/"
+      path: "/"
+      fullPath: "/"
+      preLoaderRoute: typeof DefaultLayoutIndexRouteImport
+      parentRoute: typeof DefaultLayoutRouteRoute
+    }
     "/_defaultLayout/sounds": {
-      id: "/_defaultLayout/sounds";
-      path: "/sounds";
-      fullPath: "/sounds";
-      preLoaderRoute: typeof DefaultLayoutSoundsRouteImport;
-      parentRoute: typeof DefaultLayoutRouteRoute;
-    };
+      id: "/_defaultLayout/sounds"
+      path: "/sounds"
+      fullPath: "/sounds"
+      preLoaderRoute: typeof DefaultLayoutSoundsRouteImport
+      parentRoute: typeof DefaultLayoutRouteRoute
+    }
     "/_defaultLayout/settings": {
-      id: "/_defaultLayout/settings";
-      path: "/settings";
-      fullPath: "/settings";
-      preLoaderRoute: typeof DefaultLayoutSettingsRouteImport;
-      parentRoute: typeof DefaultLayoutRouteRoute;
-    };
+      id: "/_defaultLayout/settings"
+      path: "/settings"
+      fullPath: "/settings"
+      preLoaderRoute: typeof DefaultLayoutSettingsRouteImport
+      parentRoute: typeof DefaultLayoutRouteRoute
+    }
     "/_defaultLayout/schedules": {
-      id: "/_defaultLayout/schedules";
-      path: "/schedules";
-      fullPath: "/schedules";
-      preLoaderRoute: typeof DefaultLayoutSchedulesRouteImport;
-      parentRoute: typeof DefaultLayoutRouteRoute;
-    };
+      id: "/_defaultLayout/schedules"
+      path: "/schedules"
+      fullPath: "/schedules"
+      preLoaderRoute: typeof DefaultLayoutSchedulesRouteImport
+      parentRoute: typeof DefaultLayoutRouteRoute
+    }
     "/_defaultLayout/profiles": {
-      id: "/_defaultLayout/profiles";
-      path: "/profiles";
-      fullPath: "/profiles";
-      preLoaderRoute: typeof DefaultLayoutProfilesRouteImport;
-      parentRoute: typeof DefaultLayoutRouteRoute;
-    };
+      id: "/_defaultLayout/profiles"
+      path: "/profiles"
+      fullPath: "/profiles"
+      preLoaderRoute: typeof DefaultLayoutProfilesRouteImport
+      parentRoute: typeof DefaultLayoutRouteRoute
+    }
   }
 }
 
 interface DefaultLayoutRouteRouteChildren {
-  DefaultLayoutProfilesRoute: typeof DefaultLayoutProfilesRoute;
-  DefaultLayoutSchedulesRoute: typeof DefaultLayoutSchedulesRoute;
-  DefaultLayoutSettingsRoute: typeof DefaultLayoutSettingsRoute;
-  DefaultLayoutSoundsRoute: typeof DefaultLayoutSoundsRoute;
-  DefaultLayoutIndexRoute: typeof DefaultLayoutIndexRoute;
+  DefaultLayoutProfilesRoute: typeof DefaultLayoutProfilesRoute
+  DefaultLayoutSchedulesRoute: typeof DefaultLayoutSchedulesRoute
+  DefaultLayoutSettingsRoute: typeof DefaultLayoutSettingsRoute
+  DefaultLayoutSoundsRoute: typeof DefaultLayoutSoundsRoute
+  DefaultLayoutIndexRoute: typeof DefaultLayoutIndexRoute
 }
 
 const DefaultLayoutRouteRouteChildren: DefaultLayoutRouteRouteChildren = {
@@ -167,16 +173,15 @@ const DefaultLayoutRouteRouteChildren: DefaultLayoutRouteRouteChildren = {
   DefaultLayoutSettingsRoute: DefaultLayoutSettingsRoute,
   DefaultLayoutSoundsRoute: DefaultLayoutSoundsRoute,
   DefaultLayoutIndexRoute: DefaultLayoutIndexRoute,
-};
+}
 
-const DefaultLayoutRouteRouteWithChildren = DefaultLayoutRouteRoute._addFileChildren(
-  DefaultLayoutRouteRouteChildren,
-);
+const DefaultLayoutRouteRouteWithChildren =
+  DefaultLayoutRouteRoute._addFileChildren(DefaultLayoutRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   DefaultLayoutRouteRoute: DefaultLayoutRouteRouteWithChildren,
   SetupRoute: SetupRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
