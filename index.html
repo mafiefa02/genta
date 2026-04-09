@@ -12,9 +12,7 @@
       (function () {
         var theme = localStorage.getItem("genta-ui-theme") || "system";
         if (theme === "system") {
-          theme = window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.classList.add(theme);
         document.documentElement.style.colorScheme = theme;

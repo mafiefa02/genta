@@ -1,4 +1,5 @@
 import { useTheme } from "-/components/theme-provider";
+import { Avatar, AvatarFallback } from "-/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,8 +38,6 @@ import {
 } from "@tabler/icons-react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
-
-import { Avatar, AvatarFallback } from "./ui/avatar";
 
 const SIDEBAR_MENU = [
   { label: "Schedules", icon: IconClock, path: "/schedules" },
