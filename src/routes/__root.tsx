@@ -1,28 +1,29 @@
-import { AppSidebar } from "-/components/app-sidebar";
-import { SidebarProvider } from "-/components/ui/sidebar";
+import { getDb } from "-/lib/db";
 import { IconLoader } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Outlet, redirect } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 export const Route = createRootRoute({
   component: Root,
   pendingComponent: RootLoading,
   errorComponent: RootError,
+  pendingMs: 0,
+  beforeLoad: async ({ location }) => {
+    if (location.pathname === "/setup") return;
+    const db = await getDb();
+    const preset = (await db.select("SELECT * FROM schedule_preset")) as unknown[];
+    if (preset.length === 0) {
+      throw redirect({ to: "/setup" });
+    }
+  },
 });
 
 function Root() {
   return (
     <>
-      <div className="flex h-dvh">
-        <SidebarProvider>
-          <AppSidebar />
-          <main className="content px-4 py-3">
-            <Outlet />
-          </main>
-        </SidebarProvider>
-      </div>
+      <Outlet />
       <TanStackDevtools
         config={{ position: "bottom-right", hideUntilHover: true }}
         plugins={[
