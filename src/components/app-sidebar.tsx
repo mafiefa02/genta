@@ -1,5 +1,14 @@
 import { useTheme } from "-/components/theme-provider";
 import { Avatar, AvatarFallback } from "-/components/ui/avatar";
+import { Button } from "-/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "-/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +23,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "-/components/ui/dropdown-menu";
+import { Input } from "-/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +36,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "-/components/ui/sidebar";
+import { presetsMutations } from "-/hooks/mutations/presets";
+import { configQueries } from "-/hooks/queries/config";
+import { presetsQueries } from "-/hooks/queries/presets";
 import {
   IconCalendarUser,
   IconCheck,
@@ -36,36 +49,22 @@ import {
   IconPlus,
   IconSettings,
 } from "@tabler/icons-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
 
 const SIDEBAR_MENU = [
   { label: "Schedules", icon: IconClock, path: "/schedules" },
-  { label: "Profiles", icon: IconCalendarUser, path: "/profiles" },
+  { label: "Schedule Presets", icon: IconCalendarUser, path: "/presets" },
   { label: "Custom Sounds", icon: IconMusic, path: "/sounds" },
   { label: "Settings", icon: IconSettings, path: "/settings" },
-];
-
-const TEAMS = [
-  {
-    name: "Acme Inc",
-    plan: "Enterprise",
-  },
-  {
-    name: "Acme Corp.",
-    plan: "Startup",
-  },
-  {
-    name: "Evil Corp.",
-    plan: "Free",
-  },
 ];
 
 export const AppSidebar = () => {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <ProfileSwitcher teams={TEAMS} />
+        <PresetSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavigationMenu menus={SIDEBAR_MENU} />
@@ -78,57 +77,118 @@ export const AppSidebar = () => {
   );
 };
 
-const ProfileSwitcher = ({ teams }: { teams: typeof TEAMS }) => {
-  const [activeTeam, setActiveTeam] = useState(teams[0]);
+const PresetSwitcher = () => {
+  const { data: presets } = useQuery(presetsQueries.list());
+  const { data: activePresetId } = useQuery(configQueries.activePresetId());
+  const queryClient = useQueryClient();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newName, setNewName] = useState("");
 
-  if (!activeTeam) {
+  const activePreset = presets?.find((p) => p.id === activePresetId);
+
+  const { mutate: activate } = useMutation(
+    presetsMutations.activate({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: configQueries.keys.all });
+      },
+    }),
+  );
+
+  const { mutate: create, isPending: isCreating } = useMutation(
+    presetsMutations.create({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: presetsQueries.keys.all });
+        queryClient.invalidateQueries({ queryKey: configQueries.keys.all });
+        setNewName("");
+        setDialogOpen(false);
+      },
+    }),
+  );
+
+  const handleCreate = () => {
+    const trimmed = newName.trim();
+    if (!trimmed || isCreating) return;
+    create(trimmed);
+  };
+
+  if (!presets || !activePreset) {
     return null;
   }
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
-            <Avatar>
-              <AvatarFallback>
-                <IconMessage2Star />
-              </AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{activeTeam.name}</span>
-              <span className="truncate text-xs text-muted-foreground">{activeTeam.plan}</span>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Profiles
-              </DropdownMenuLabel>
-              {teams.map((team) => (
-                <DropdownMenuItem
-                  key={team.name}
-                  onClick={() => setActiveTeam(team)}
-                  className="gap-2 p-2"
-                >
-                  <div className="flex size-6 items-center justify-center rounded-md border">
-                    <IconMessage2Star className="size-3.5 shrink-0" />
-                  </div>
-                  {team.name}
+    <>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<SidebarMenuButton size="lg" />}>
+              <Avatar>
+                <AvatarFallback>
+                  <IconMessage2Star />
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{activePreset.name}</span>
+                <span className="truncate text-xs text-muted-foreground">
+                  {activePreset.description ?? "Schedule preset"}
+                </span>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                  Presets
+                </DropdownMenuLabel>
+                {presets.map((preset) => (
+                  <DropdownMenuItem
+                    key={preset.id}
+                    onClick={() => activate(preset.id)}
+                    className="gap-2 p-2"
+                  >
+                    <div className="flex size-6 items-center justify-center rounded-md border">
+                      <IconMessage2Star className="size-3.5 shrink-0" />
+                    </div>
+                    {preset.name}
+                    {preset.id === activePresetId && (
+                      <DropdownMenuShortcut>
+                        <IconCheck className="size-4" />
+                      </DropdownMenuShortcut>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => setDialogOpen(true)}>
+                  <IconPlus className="size-4" />
+                  <span>Create a new preset</span>
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconPlus className="size-4" />
-                <span>Create a new profile</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create a new profile</DialogTitle>
+            <DialogDescription>Enter a name for your new schedule profile.</DialogDescription>
+          </DialogHeader>
+          <Input
+            placeholder="cth. Jadwal Reguler"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+            disabled={isCreating}
+          />
+          <DialogFooter>
+            <Button onClick={handleCreate} disabled={!newName.trim() || isCreating}>
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
