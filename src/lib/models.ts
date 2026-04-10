@@ -6,6 +6,15 @@ export interface SchedulePreset {
   updated_at: string | null;
 }
 
+export interface SchedulePresetWithDays extends SchedulePreset {
+  business_days: number[];
+}
+
+export interface PresetBusinessDay {
+  preset_id: number;
+  weekday: number;
+}
+
 export interface CustomSound {
   id: number;
   label: string | null;
