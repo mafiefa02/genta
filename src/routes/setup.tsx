@@ -92,7 +92,7 @@ const CreatePresetControl = () => {
   const handleSubmit = () => {
     const trimmed = name.trim();
     if (!trimmed || isPending) return;
-    mutate(trimmed);
+    mutate({ name: trimmed });
   };
 
   return (

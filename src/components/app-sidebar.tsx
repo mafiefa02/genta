@@ -113,7 +113,7 @@ const PresetSwitcher = () => {
   const handleCreate = () => {
     const trimmed = newName.trim();
     if (!trimmed || isCreating) return;
-    create(trimmed);
+    create({ name: trimmed });
   };
 
   if (!presets || !activePreset) {
@@ -131,7 +131,7 @@ const PresetSwitcher = () => {
                 render={<DropdownMenuTrigger render={<SidebarMenuButton size="lg" />} />}
               >
                 <Avatar>
-                  <AvatarFallback>
+                  <AvatarFallback className="border bg-primary text-background dark:text-foreground">
                     <IconMessage2Star />
                   </AvatarFallback>
                 </Avatar>
@@ -154,10 +154,10 @@ const PresetSwitcher = () => {
                     onClick={() => activate(preset.id)}
                     className="gap-2 p-2"
                   >
-                    <div className="flex size-6 items-center justify-center rounded-md border">
+                    <div className="flex size-6 shrink-0 items-center justify-center rounded-md border">
                       <IconMessage2Star className="size-3.5 shrink-0" />
                     </div>
-                    {preset.name}
+                    <p className="truncate">{preset.name}</p>
                     {preset.id === activePresetId && (
                       <DropdownMenuShortcut>
                         <IconCheck className="size-4" />
