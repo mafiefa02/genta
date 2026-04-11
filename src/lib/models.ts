@@ -36,6 +36,10 @@ export interface Schedule {
   updated_at: string | null;
 }
 
+export interface ScheduleWithWeekdays extends Schedule {
+  weekdays: number[];
+}
+
 export interface ScheduleWeekday {
   schedule_id: number;
   weekday: number;

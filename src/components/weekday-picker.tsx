@@ -13,10 +13,13 @@ export const WEEKDAYS = [
 interface WeekdayPickerProps {
   value: number[];
   onChange: (days: number[]) => void;
+  availableDays?: number[];
   disabled?: boolean;
 }
 
-export function WeekdayPicker({ value, onChange, disabled }: WeekdayPickerProps) {
+export function WeekdayPicker({ value, onChange, availableDays, disabled }: WeekdayPickerProps) {
+  const days = availableDays ? WEEKDAYS.filter((d) => availableDays.includes(d.value)) : WEEKDAYS;
+
   return (
     <ToggleGroup
       multiple
@@ -28,7 +31,7 @@ export function WeekdayPicker({ value, onChange, disabled }: WeekdayPickerProps)
       aria-label="Hari operasional"
       className="w-full"
     >
-      {WEEKDAYS.map((day) => (
+      {days.map((day) => (
         <ToggleGroupItem key={day.value} value={String(day.value)} className="flex-1">
           {day.label}
         </ToggleGroupItem>
