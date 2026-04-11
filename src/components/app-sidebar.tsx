@@ -30,19 +30,17 @@ import {
   IconCalendarUser,
   IconCheck,
   IconClock,
-  IconHome,
   IconMenu2,
   IconMusic,
-  IconSettings,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "@tanstack/react-router";
 
 const SIDEBAR_MENU = [
-  { label: "Beranda", icon: IconHome, path: "/" },
+  // { label: "Beranda", icon: IconHome, path: "/" },
   { label: "Jadwal", icon: IconClock, path: "/schedules" },
   { label: "Preset Jadwal", icon: IconCalendarUser, path: "/presets" },
   { label: "Suara Kustom", icon: IconMusic, path: "/sounds" },
-  { label: "Pengaturan", icon: IconSettings, path: "/settings" },
+  // { label: "Pengaturan", icon: IconSettings, path: "/settings" },
 ];
 
 export const AppSidebar = () => {
