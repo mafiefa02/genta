@@ -1,4 +1,4 @@
-import { Button } from "-/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "-/components/ui/toggle-group";
 
 export const WEEKDAYS = [
   { value: 1, label: "Sen" },
@@ -17,25 +17,22 @@ interface WeekdayPickerProps {
 }
 
 export function WeekdayPicker({ value, onChange, disabled }: WeekdayPickerProps) {
-  const toggle = (day: number) => {
-    onChange(value.includes(day) ? value.filter((d) => d !== day) : [...value, day].sort());
-  };
-
   return (
-    <div role="group" aria-label="Hari operasional" className="flex gap-1.5">
+    <ToggleGroup
+      multiple
+      size="sm"
+      variant="outline"
+      value={value.map(String)}
+      onValueChange={(vals) => onChange(vals.map(Number).sort())}
+      disabled={disabled}
+      aria-label="Hari operasional"
+      className="w-full"
+    >
       {WEEKDAYS.map((day) => (
-        <Button
-          key={day.value}
-          type="button"
-          size="sm"
-          variant={value.includes(day.value) ? "default" : "outline"}
-          onClick={() => toggle(day.value)}
-          disabled={disabled}
-          className="min-w-9 flex-1"
-        >
+        <ToggleGroupItem key={day.value} value={String(day.value)} className="flex-1">
           {day.label}
-        </Button>
+        </ToggleGroupItem>
       ))}
-    </div>
+    </ToggleGroup>
   );
 }
