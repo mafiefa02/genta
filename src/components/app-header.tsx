@@ -91,7 +91,7 @@ const PresetSwitcher = () => {
         <DropdownMenuContent align="start">
           <DropdownMenuGroup>
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Preset jadwal
+              Preset Jadwal
             </DropdownMenuLabel>
             {presets.map((preset) => (
               <DropdownMenuItem
@@ -112,7 +112,7 @@ const PresetSwitcher = () => {
           <DropdownMenuGroup>
             <DropdownMenuItem onClick={() => setDialogOpen(true)}>
               <IconPlus className="size-4" />
-              <span>Buat preset baru</span>
+              <span>Buat Preset Baru</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -133,7 +133,7 @@ const PresetSwitcher = () => {
           />
           <DialogFooter>
             <Button onClick={handleCreate} disabled={!newName.trim() || isCreating}>
-              Buat preset
+              Buat Preset
             </Button>
           </DialogFooter>
         </DialogContent>
