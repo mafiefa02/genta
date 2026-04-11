@@ -229,15 +229,21 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
                     </p>
                   )}
                   <div className="mt-2 flex gap-1">
-                    {WEEKDAYS.map((day) => (
-                      <Badge
-                        key={day.value}
-                        variant={schedule.weekdays.includes(day.value) ? "secondary" : "outline"}
-                        className={schedule.weekdays.includes(day.value) ? undefined : "opacity-40"}
-                      >
-                        {day.label}
-                      </Badge>
-                    ))}
+                    {businessDays.map((businessDay) => {
+                      const day = WEEKDAYS.find((w) => w.value === businessDay);
+                      if (!day) return;
+                      return (
+                        <Badge
+                          key={day.value}
+                          variant={schedule.weekdays.includes(day.value) ? "secondary" : "outline"}
+                          className={
+                            schedule.weekdays.includes(day.value) ? undefined : "opacity-40"
+                          }
+                        >
+                          {day.label}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
 
