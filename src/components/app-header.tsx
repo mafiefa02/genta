@@ -152,16 +152,22 @@ const timeFormatter = new Intl.DateTimeFormat("id-ID", {
   timeZoneName: "short",
 });
 
+const dateFormatter = new Intl.DateTimeFormat("id-ID", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
 const CurrentLocalTime = () => {
-  const [time, setTime] = useState(() => timeFormatter.format(new Date()));
+  const [now, setNow] = useState(() => new Date());
   const rafId = useRef(0);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     const tick = () => {
-      const now = new Date();
-      setTime(timeFormatter.format(now));
-      timer = setTimeout(tick, 1000 - now.getMilliseconds());
+      const current = new Date();
+      setNow(current);
+      timer = setTimeout(tick, 1000 - current.getMilliseconds());
     };
     timer = setTimeout(tick, 1000 - new Date().getMilliseconds());
     return () => {
@@ -172,8 +178,8 @@ const CurrentLocalTime = () => {
 
   return (
     <div className="grid gap-0 text-right text-xs leading-none">
-      <span className="font-medium">Waktu Lokal</span>
-      <span className="text-muted-foreground tabular-nums">{time}</span>
+      <span className="font-medium">{dateFormatter.format(now)}</span>
+      <span className="text-muted-foreground tabular-nums">{timeFormatter.format(now)}</span>
     </div>
   );
 };
