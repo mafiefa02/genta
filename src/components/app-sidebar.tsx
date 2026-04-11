@@ -1,14 +1,5 @@
 import { useTheme } from "-/components/theme-provider";
 import { Avatar, AvatarFallback } from "-/components/ui/avatar";
-import { Button } from "-/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "-/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,14 +7,12 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuPortal,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "-/components/ui/dropdown-menu";
-import { Input } from "-/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
@@ -35,26 +24,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  useSidebar,
 } from "-/components/ui/sidebar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "-/components/ui/tooltip";
-import { presetsMutations } from "-/hooks/mutations/presets";
-import { configQueries } from "-/hooks/queries/config";
-import { presetsQueries } from "-/hooks/queries/presets";
 import {
+  IconBell,
   IconCalendarUser,
   IconCheck,
   IconClock,
   IconHome,
   IconMenu2,
-  IconMessage2Star,
   IconMusic,
-  IconPlus,
   IconSettings,
 } from "@tabler/icons-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
-import { useState } from "react";
 
 const SIDEBAR_MENU = [
   { label: "Beranda", icon: IconHome, path: "/" },
@@ -68,7 +49,23 @@ export const AppSidebar = () => {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <PresetSwitcher />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg">
+              <Avatar>
+                <AvatarFallback className="border bg-primary text-background dark:text-foreground">
+                  <IconBell />
+                </AvatarFallback>
+              </Avatar>
+              <div className="grid leading-none">
+                <span className="font-semibold">Genta</span>
+                <span className="line-clamp-1 text-xs text-ellipsis text-muted-foreground">
+                  Aplikasi Bel
+                </span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavigationMenu menus={SIDEBAR_MENU} />
@@ -78,127 +75,6 @@ export const AppSidebar = () => {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  );
-};
-
-const PresetSwitcher = () => {
-  const { isMobile, state } = useSidebar();
-  const { data: presets } = useQuery(presetsQueries.list());
-  const { data: activePresetId } = useQuery(configQueries.activePresetId());
-  const queryClient = useQueryClient();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [newName, setNewName] = useState("");
-
-  const activePreset = presets?.find((p) => p.id === activePresetId);
-
-  const { mutate: activate } = useMutation(
-    presetsMutations.activate({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: configQueries.keys.all });
-      },
-    }),
-  );
-
-  const { mutate: create, isPending: isCreating } = useMutation(
-    presetsMutations.create({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: presetsQueries.keys.all });
-        queryClient.invalidateQueries({ queryKey: configQueries.keys.all });
-        setNewName("");
-        setDialogOpen(false);
-      },
-    }),
-  );
-
-  const handleCreate = () => {
-    const trimmed = newName.trim();
-    if (!trimmed || isCreating) return;
-    create({ name: trimmed });
-  };
-
-  if (!presets || !activePreset) {
-    return null;
-  }
-
-  return (
-    <>
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <DropdownMenu>
-            <Tooltip disabled={isMobile || state === "expanded"}>
-              <TooltipContent side="right">Change preset</TooltipContent>
-              <TooltipTrigger
-                render={<DropdownMenuTrigger render={<SidebarMenuButton size="lg" />} />}
-              >
-                <Avatar>
-                  <AvatarFallback className="border bg-primary text-background dark:text-foreground">
-                    <IconMessage2Star />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{activePreset.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {activePreset.description ?? "Preset jadwal"}
-                  </span>
-                </div>
-              </TooltipTrigger>
-            </Tooltip>
-            <DropdownMenuContent side="right">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  Preset jadwal
-                </DropdownMenuLabel>
-                {presets.map((preset) => (
-                  <DropdownMenuItem
-                    key={preset.id}
-                    onClick={() => activate(preset.id)}
-                    className="gap-2 p-2"
-                  >
-                    <div className="flex size-6 shrink-0 items-center justify-center rounded-md border">
-                      <IconMessage2Star className="size-3.5 shrink-0" />
-                    </div>
-                    <p className="truncate">{preset.name}</p>
-                    {preset.id === activePresetId && (
-                      <DropdownMenuShortcut>
-                        <IconCheck className="size-4" />
-                      </DropdownMenuShortcut>
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setDialogOpen(true)}>
-                  <IconPlus className="size-4" />
-                  <span>Buat preset baru</span>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem>
-      </SidebarMenu>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Preset Baru</DialogTitle>
-            <DialogDescription>Masukkan nama untuk preset baru yang akan dibuat</DialogDescription>
-          </DialogHeader>
-          <Input
-            placeholder="cth. Jadwal Reguler"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-            disabled={isCreating}
-          />
-          <DialogFooter>
-            <Button onClick={handleCreate} disabled={!newName.trim() || isCreating}>
-              Buat preset
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
   );
 };
 
