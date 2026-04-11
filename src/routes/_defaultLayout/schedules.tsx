@@ -49,7 +49,7 @@ import {
 } from "@tabler/icons-react";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_defaultLayout/schedules")({
   component: RouteComponent,
@@ -124,6 +124,8 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
     return businessDays.includes(isoDay) ? isoDay : null;
   });
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ScheduleWithWeekdays | null>(null);
   const [deletingSchedule, setDeletingSchedule] = useState<ScheduleWithWeekdays | null>(null);
 
@@ -259,7 +261,12 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
                         {isActive ? <IconPlayerPause /> : <IconPlayerPlay />}
                         {isActive ? "Nonaktifkan" : "Aktifkan"}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setEditingSchedule(schedule)}>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setEditDialogOpen(true);
+                          setEditingSchedule(schedule);
+                        }}
+                      >
                         <IconPencil />
                         Edit
                       </DropdownMenuItem>
@@ -268,7 +275,10 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
                     <DropdownMenuGroup>
                       <DropdownMenuItem
                         variant="destructive"
-                        onClick={() => setDeletingSchedule(schedule)}
+                        onClick={() => {
+                          setDeleteDialogOpen(true);
+                          setDeletingSchedule(schedule);
+                        }}
                       >
                         <IconTrash />
                         Hapus
@@ -287,38 +297,29 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
         onOpenChange={setCreateDialogOpen}
         presetId={presetId}
         businessDays={businessDays}
+        defaultSelectedDays={viewDay ? [viewDay] : businessDays}
         sounds={sounds}
       />
 
-      <Dialog
-        open={editingSchedule !== null}
-        onOpenChange={(open) => {
-          if (!open) setEditingSchedule(null);
-        }}
-      >
-        {editingSchedule && (
-          <EditScheduleDialogContent
-            schedule={editingSchedule}
-            businessDays={businessDays}
-            sounds={sounds}
-            onClose={() => setEditingSchedule(null)}
-          />
-        )}
-      </Dialog>
+      {editingSchedule && (
+        <EditScheduleDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          schedule={editingSchedule}
+          businessDays={businessDays}
+          sounds={sounds}
+          onClose={() => setEditingSchedule(null)}
+        />
+      )}
 
-      <Dialog
-        open={deletingSchedule !== null}
-        onOpenChange={(open) => {
-          if (!open) setDeletingSchedule(null);
-        }}
-      >
-        {deletingSchedule && (
-          <DeleteScheduleDialogContent
-            schedule={deletingSchedule}
-            onClose={() => setDeletingSchedule(null)}
-          />
-        )}
-      </Dialog>
+      {deletingSchedule && (
+        <DeleteScheduleDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          schedule={deletingSchedule}
+          onClose={() => setDeletingSchedule(null)}
+        />
+      )}
     </div>
   );
 }
@@ -329,29 +330,45 @@ function CreateScheduleDialog({
   presetId,
   businessDays,
   sounds,
+  defaultSelectedDays,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   presetId: number;
   businessDays: number[];
   sounds: CustomSound[];
+  defaultSelectedDays: number[];
 }) {
   const queryClient = useQueryClient();
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
   const [time, setTime] = useState("07:00");
-  const [weekdays, setWeekdays] = useState<number[]>(businessDays);
+  const [weekdays, setWeekdays] = useState<number[]>(defaultSelectedDays);
   const [customSoundId, setCustomSoundId] = useState<number | null>(null);
+
+  const resetForm = () => {
+    setLabel("");
+    setDescription("");
+    setTime("07:00");
+    setWeekdays(defaultSelectedDays);
+    setCustomSoundId(null);
+  };
+
+  useEffect(() => {
+    if (open) {
+      setLabel("");
+      setDescription("");
+      setTime("07:00");
+      setWeekdays(defaultSelectedDays);
+      setCustomSoundId(null);
+    }
+  }, [open, defaultSelectedDays]);
 
   const { mutate: create, isPending } = useMutation(
     schedulesMutations.create({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: schedulesQueries.keys.all });
-        setLabel("");
-        setDescription("");
-        setTime("07:00");
-        setWeekdays(businessDays);
-        setCustomSoundId(null);
+        resetForm();
         onOpenChange(false);
       },
     }),
@@ -410,12 +427,16 @@ function CreateScheduleDialog({
   );
 }
 
-function EditScheduleDialogContent({
+function EditScheduleDialog({
+  open,
+  onOpenChange,
   schedule,
   businessDays,
   sounds,
   onClose,
 }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   schedule: ScheduleWithWeekdays;
   businessDays: number[];
   sounds: CustomSound[];
@@ -430,10 +451,30 @@ function EditScheduleDialogContent({
   const [weekdays, setWeekdays] = useState<number[]>(schedule.weekdays);
   const [customSoundId, setCustomSoundId] = useState<number | null>(schedule.custom_sound_id);
 
+  const resetForm = () => {
+    setLabel(schedule.label);
+    setDescription(schedule.description ?? "");
+    setTime(fmtTime(localTime.hours, localTime.minutes));
+    setWeekdays(schedule.weekdays);
+    setCustomSoundId(schedule.custom_sound_id);
+  };
+
+  useEffect(() => {
+    if (open) {
+      const localTime = utcSecondsToLocal(schedule.utc_trigger_time);
+      setLabel(schedule.label);
+      setDescription(schedule.description ?? "");
+      setTime(fmtTime(localTime.hours, localTime.minutes));
+      setWeekdays(schedule.weekdays);
+      setCustomSoundId(schedule.custom_sound_id);
+    }
+  }, [open]);
+
   const { mutate: update, isPending } = useMutation(
     schedulesMutations.update({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: schedulesQueries.keys.all });
+        resetForm();
         onClose();
       },
     }),
@@ -454,44 +495,58 @@ function EditScheduleDialogContent({
   };
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Edit Jadwal</DialogTitle>
-        <DialogDescription>Ubah informasi jadwal.</DialogDescription>
-      </DialogHeader>
-      <ScheduleForm
-        label={label}
-        onLabelChange={setLabel}
-        description={description}
-        onDescriptionChange={setDescription}
-        time={time}
-        onTimeChange={setTime}
-        weekdays={weekdays}
-        onWeekdaysChange={setWeekdays}
-        businessDays={businessDays}
-        customSoundId={customSoundId}
-        onCustomSoundIdChange={setCustomSoundId}
-        sounds={sounds}
-        disabled={isPending}
-        onSubmit={handleSubmit}
-      />
-      <DialogFooter>
-        <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
-        <Button
-          onClick={handleSubmit}
-          disabled={!label.trim() || weekdays.length === 0 || isPending}
-        >
-          Simpan
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose();
+        }
+        onOpenChange(open);
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Jadwal</DialogTitle>
+          <DialogDescription>Ubah informasi jadwal.</DialogDescription>
+        </DialogHeader>
+        <ScheduleForm
+          label={label}
+          onLabelChange={setLabel}
+          description={description}
+          onDescriptionChange={setDescription}
+          time={time}
+          onTimeChange={setTime}
+          weekdays={weekdays}
+          onWeekdaysChange={setWeekdays}
+          businessDays={businessDays}
+          customSoundId={customSoundId}
+          onCustomSoundIdChange={setCustomSoundId}
+          sounds={sounds}
+          disabled={isPending}
+          onSubmit={handleSubmit}
+        />
+        <DialogFooter>
+          <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
+          <Button
+            onClick={handleSubmit}
+            disabled={!label.trim() || weekdays.length === 0 || isPending}
+          >
+            Simpan
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-function DeleteScheduleDialogContent({
+function DeleteScheduleDialog({
+  open,
+  onOpenChange,
   schedule,
   onClose,
 }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   schedule: Schedule;
   onClose: () => void;
 }) {
@@ -507,25 +562,35 @@ function DeleteScheduleDialogContent({
   );
 
   return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Hapus Jadwal</DialogTitle>
-        <DialogDescription>
-          Apakah Anda yakin ingin menghapus jadwal "{schedule.label}"? Tindakan ini tidak dapat
-          dibatalkan.
-        </DialogDescription>
-      </DialogHeader>
-      <DialogFooter>
-        <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
-        <Button
-          variant="destructive"
-          onClick={() => deleteSchedule(schedule.id)}
-          disabled={isPending}
-        >
-          Hapus
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose();
+        }
+        onOpenChange(open);
+      }}
+    >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hapus Jadwal</DialogTitle>
+          <DialogDescription>
+            Apakah Anda yakin ingin menghapus jadwal "{schedule.label}"? Tindakan ini tidak dapat
+            dibatalkan.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
+          <Button
+            variant="destructive"
+            onClick={() => deleteSchedule(schedule.id)}
+            disabled={isPending}
+          >
+            Hapus
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
