@@ -14,7 +14,7 @@ function RouteComponent() {
         <AppSidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <AppHeader />
-          <main className="content px-4 py-3">
+          <main className="content flex-1 overflow-y-auto px-4 py-3">
             <Outlet />
           </main>
         </div>
