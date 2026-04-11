@@ -21,6 +21,7 @@ import {
 } from "-/components/ui/dropdown-menu";
 import { Input } from "-/components/ui/input";
 import { Label } from "-/components/ui/label";
+import { Skeleton } from "-/components/ui/skeleton";
 import { Textarea } from "-/components/ui/textarea";
 import { WEEKDAYS, WeekdayPicker } from "-/components/weekday-picker";
 import { DEFAULT_BUSINESS_DAYS, presetsMutations } from "-/hooks/mutations/presets";
@@ -40,6 +41,7 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/_defaultLayout/presets")({
   component: RouteComponent,
+  pendingComponent: PendingComponent,
   loader: ({ context }) => {
     return Promise.all([
       context.queryClient.ensureQueryData(presetsQueries.list()),
@@ -373,5 +375,29 @@ function DeletePresetDialogContent({
         </Button>
       </DialogFooter>
     </DialogContent>
+  );
+}
+
+function PendingComponent() {
+  return (
+    <div className="mx-auto flex w-full flex-col gap-4 overflow-hidden">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-heading text-lg font-medium">Preset Jadwal</h1>
+          <p className="text-sm text-muted-foreground">
+            Kelola preset untuk mengatur berbagai profil jadwal bel.
+          </p>
+        </div>
+        <Button disabled>
+          <IconPlus data-icon="inline-start" />
+          Buat Preset
+        </Button>
+      </div>
+      <div className="flex flex-col gap-2">
+        {[0, 1, 2, 3, 4, 5].map((skeleton) => (
+          <Skeleton className="h-20" key={skeleton} />
+        ))}
+      </div>
+    </div>
   );
 }
