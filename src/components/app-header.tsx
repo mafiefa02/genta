@@ -53,6 +53,7 @@ const PresetSwitcher = () => {
     presetsMutations.activate({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: configQueries.keys.all });
+        queryClient.invalidateQueries({ queryKey: configQueries.keys.key("activePresetId") });
       },
     }),
   );
@@ -62,6 +63,7 @@ const PresetSwitcher = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: presetsQueries.keys.all });
         queryClient.invalidateQueries({ queryKey: configQueries.keys.all });
+        queryClient.invalidateQueries({ queryKey: configQueries.keys.key("activePresetId") });
         setNewName("");
         setDialogOpen(false);
       },

@@ -108,7 +108,13 @@ function RouteComponent() {
     );
   }
 
-  return <ScheduleList presetId={activePresetId} businessDays={activePreset.business_days} />;
+  return (
+    <ScheduleList
+      key={activePresetId}
+      presetId={activePresetId}
+      businessDays={activePreset.business_days}
+    />
+  );
 }
 
 function ScheduleList({ presetId, businessDays }: { presetId: number; businessDays: number[] }) {
