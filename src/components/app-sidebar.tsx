@@ -107,7 +107,7 @@ const Footer = () => {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger render={<SidebarMenuButton />}>
+          <DropdownMenuTrigger render={<SidebarMenuButton tooltip="Preferensi" />}>
             <IconMenu2 />
             <span>Preferensi</span>
           </DropdownMenuTrigger>
