@@ -28,9 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "-/components/ui/select";
+import { Skeleton } from "-/components/ui/skeleton";
 import { Textarea } from "-/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "-/components/ui/toggle-group";
 import { WEEKDAYS, WeekdayPicker } from "-/components/weekday-picker";
+import { DEFAULT_BUSINESS_DAYS } from "-/hooks/mutations/presets";
 import { schedulesMutations } from "-/hooks/mutations/schedules";
 import { configQueries } from "-/hooks/queries/config";
 import { presetsQueries } from "-/hooks/queries/presets";
@@ -51,6 +53,8 @@ import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/_defaultLayout/schedules")({
   component: RouteComponent,
+  pendingComponent: PendingComponent,
+  errorComponent: ErrorComponent,
   loader: async ({ context }) => {
     const [activePresetId] = await Promise.all([
       context.queryClient.ensureQueryData(configQueries.activePresetId()),
@@ -622,6 +626,69 @@ function ScheduleForm({
           availableDays={businessDays}
           disabled={disabled}
         />
+      </div>
+    </div>
+  );
+}
+
+const PendingHeader = () => {
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-heading text-lg font-medium">Jadwal</h1>
+          <p className="text-sm text-muted-foreground">
+            Kelola jadwal bel untuk preset yang sedang aktif.
+          </p>
+        </div>
+        <Button disabled>
+          <IconPlus data-icon="inline-start" />
+          Buat Jadwal
+        </Button>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className="relative">
+          <IconSearch className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input disabled placeholder="Cari jadwal..." className="pl-9" />
+        </div>
+        <ToggleGroup disabled value={["all"]} size="sm" variant="outline" className="w-full">
+          <ToggleGroupItem value="all" className="flex-1">
+            Semua
+          </ToggleGroupItem>
+          {DEFAULT_BUSINESS_DAYS.map((day) => {
+            const label = WEEKDAYS.find((w) => w.value === day)?.label ?? String(day);
+            return (
+              <ToggleGroupItem key={day} value={String(day)} className="flex-1">
+                {label}
+              </ToggleGroupItem>
+            );
+          })}
+        </ToggleGroup>
+      </div>
+    </>
+  );
+};
+
+function PendingComponent() {
+  return (
+    <div className="mx-auto flex w-full flex-col gap-4 overflow-hidden">
+      <PendingHeader />
+      <div className="flex flex-col gap-2">
+        {[0, 1, 2, 3, 4, 5].map((skeleton) => (
+          <Skeleton className="h-24" key={skeleton} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ErrorComponent() {
+  return (
+    <div className="mx-auto flex w-full flex-col gap-4 overflow-hidden">
+      <PendingHeader />
+      <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-destructive p-8 text-center">
+        <p className="text-sm text-destructive">Terjadi kesalahan saat memuat laman ini.</p>
       </div>
     </div>
   );
