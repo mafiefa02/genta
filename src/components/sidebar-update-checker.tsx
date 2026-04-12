@@ -93,8 +93,8 @@ export function SidebarUpdateChecker() {
       {status === "downloading" ? <IconLoader2 className="animate-spin" /> : <IconDownload />}
       <span className="line-clamp-1 group-data-[collapsible=icon]:hidden">
         {status === "downloading"
-          ? `Downloading ${progress}%`
-          : `Update available (v${update.version})`}
+          ? `Mengunduh ${progress}%`
+          : `Pembaruan tersedia (v${update.version})`}
       </span>
     </SidebarMenuButton>
   );
@@ -110,7 +110,7 @@ function CheckingForUpdateState({ className }: { className?: string }) {
       disabled
     >
       <IconLoader2 className="animate-spin" />
-      <span className="group-data-[collapsible=icon]:hidden">Checking for updates...</span>
+      <span className="group-data-[collapsible=icon]:hidden">Mengecek versi terbaru...</span>
     </SidebarMenuButton>
   );
 }
@@ -124,7 +124,7 @@ function DoneUpdatingState({ className }: { className?: string }) {
       )}
     >
       <IconSquareRoundedCheck />
-      <span>Update installed. Please restart the app.</span>
+      <span>Pembaruan terinstal, silakan mulai ulang.</span>
     </SidebarMenuButton>
   );
 }
@@ -150,11 +150,11 @@ function FailedToUpdateState({
       >
         <IconDownload />
         <span className="line-clamp-1 group-data-[collapsible=icon]:hidden">
-          Failed to update. Try again?
+          Gagal memperbarui. Coba lagi?
         </span>
       </SidebarMenuButton>
       <TooltipContent>
-        Update failed: {error || "Update failed with no error. Please contact the developer."}
+        Pembaruan gagal: {error || "Update failed with no error. Please contact the developer."}
       </TooltipContent>
     </Tooltip>
   );
