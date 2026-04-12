@@ -30,6 +30,7 @@ jobs:
 
       - name: Generate release notes
         id: release_notes
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
