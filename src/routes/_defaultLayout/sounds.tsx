@@ -1,5 +1,3 @@
-import type { CustomSound } from "-/lib/models";
-
 import { Badge } from "-/components/ui/badge";
 import { Button } from "-/components/ui/button";
 import {
@@ -24,6 +22,7 @@ import { Label } from "-/components/ui/label";
 import { Skeleton } from "-/components/ui/skeleton";
 import { soundsMutations } from "-/hooks/mutations/sounds";
 import { soundsQueries } from "-/hooks/queries/sounds";
+import type { CustomSound } from "-/lib/models";
 import { getAbsoluteFileBlobUrl, getSoundBlobUrl, pickAudioFile } from "-/lib/sounds-fs";
 import {
   IconDotsVertical,
@@ -96,7 +95,7 @@ function RouteComponent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-lg font-medium">Suara Kustom</h1>
-          <p className="text-sm text-muted-foreground">Kelola suara kustom untuk jadwal bel.</p>
+          <p className="text-muted-foreground text-sm">Kelola suara kustom untuk jadwal bel.</p>
         </div>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <IconPlus data-icon="inline-start" />
@@ -105,8 +104,11 @@ function RouteComponent() {
       </div>
 
       {sounds.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed p-8 text-center text-muted-foreground">
-          <IconFileMusic size={32} className="opacity-50" />
+        <div className="text-muted-foreground flex flex-col items-center gap-2 rounded-2xl border border-dashed p-8 text-center">
+          <IconFileMusic
+            size={32}
+            className="opacity-50"
+          />
           <p>Belum ada suara kustom.</p>
           <p className="text-sm">Tambahkan suara untuk digunakan pada jadwal bel.</p>
         </div>
@@ -117,7 +119,7 @@ function RouteComponent() {
             return (
               <div
                 key={sound.id}
-                className="flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border bg-card p-4"
+                className="bg-card flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border p-4"
               >
                 <Button
                   variant="ghost"
@@ -128,12 +130,19 @@ function RouteComponent() {
                 </Button>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{sound.label || sound.file_path}</p>
-                  <p className="truncate text-sm text-muted-foreground">
+                  <p className="text-muted-foreground truncate text-sm">
                     {sound.file_path.split("/").pop()}
                   </p>
                 </div>
                 <DropdownMenu>
-                  <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                      />
+                    }
+                  >
                     <IconDotsVertical />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -196,7 +205,10 @@ function RouteComponent() {
         }}
       >
         {deletingSound && (
-          <DeleteSoundDialogContent sound={deletingSound} onClose={() => setDeletingSound(null)} />
+          <DeleteSoundDialogContent
+            sound={deletingSound}
+            onClose={() => setDeletingSound(null)}
+          />
         )}
       </Dialog>
     </div>
@@ -299,15 +311,28 @@ function CreateSoundDialog({
           <div className="flex flex-col gap-1.5">
             <Label>File Audio</Label>
             {selectedPath ? (
-              <div className="flex items-center gap-2 rounded-xl border bg-muted/50 p-3">
-                <IconFileMusic className="shrink-0 text-muted-foreground" size={20} />
+              <div className="bg-muted/50 flex items-center gap-2 rounded-xl border p-3">
+                <IconFileMusic
+                  className="text-muted-foreground shrink-0"
+                  size={20}
+                />
                 <span className="min-w-0 flex-1 truncate text-sm">
                   {selectedPath.split("/").pop()?.split("\\").pop()}
                 </span>
-                <Button variant="ghost" size="icon-sm" onClick={togglePreview} disabled={isPending}>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={togglePreview}
+                  disabled={isPending}
+                >
                   {isPreviewPlaying ? <IconPlayerPause size={16} /> : <IconPlayerPlay size={16} />}
                 </Button>
-                <Button variant="outline" size="sm" onClick={handlePickFile} disabled={isPending}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePickFile}
+                  disabled={isPending}
+                >
                   Ganti
                 </Button>
               </div>
@@ -316,7 +341,7 @@ function CreateSoundDialog({
                 type="button"
                 onClick={handlePickFile}
                 disabled={isPending}
-                className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-6 text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+                className="text-muted-foreground hover:border-primary hover:text-foreground flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-6 transition-colors"
               >
                 <IconUpload size={24} />
                 <span className="text-sm">Klik untuk memilih file audio</span>
@@ -337,7 +362,10 @@ function CreateSoundDialog({
         </div>
         <DialogFooter>
           <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
-          <Button onClick={handleSubmit} disabled={!label.trim() || !selectedPath || isPending}>
+          <Button
+            onClick={handleSubmit}
+            disabled={!label.trim() || !selectedPath || isPending}
+          >
             Tambah Suara
           </Button>
         </DialogFooter>
@@ -427,20 +455,36 @@ function EditSoundDialogContent({ sound, onClose }: { sound: CustomSound; onClos
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <Label>File Audio</Label>
-          <div className="flex items-center gap-2 rounded-xl border bg-muted/50 p-3">
-            <IconFileMusic className="shrink-0 text-muted-foreground" size={20} />
+          <div className="bg-muted/50 flex items-center gap-2 rounded-xl border p-3">
+            <IconFileMusic
+              className="text-muted-foreground shrink-0"
+              size={20}
+            />
             <span className="min-w-0 flex-1 truncate text-sm">
               {displayFileName}
               {newSourcePath && (
-                <Badge variant="secondary" className="ml-2">
+                <Badge
+                  variant="secondary"
+                  className="ml-2"
+                >
                   Baru
                 </Badge>
               )}
             </span>
-            <Button variant="ghost" size="icon-sm" onClick={togglePreview} disabled={isPending}>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={togglePreview}
+              disabled={isPending}
+            >
               {isPreviewPlaying ? <IconPlayerPause size={16} /> : <IconPlayerPlay size={16} />}
             </Button>
-            <Button variant="outline" size="sm" onClick={handlePickFile} disabled={isPending}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePickFile}
+              disabled={isPending}
+            >
               Ganti
             </Button>
           </div>
@@ -459,7 +503,10 @@ function EditSoundDialogContent({ sound, onClose }: { sound: CustomSound; onClos
       </div>
       <DialogFooter>
         <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
-        <Button onClick={handleSubmit} disabled={!label.trim() || isPending}>
+        <Button
+          onClick={handleSubmit}
+          disabled={!label.trim() || isPending}
+        >
           Simpan
         </Button>
       </DialogFooter>
@@ -515,7 +562,7 @@ function PendingComponent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-lg font-medium">Suara Kustom</h1>
-          <p className="text-sm text-muted-foreground">Kelola suara kustom untuk jadwal bel.</p>
+          <p className="text-muted-foreground text-sm">Kelola suara kustom untuk jadwal bel.</p>
         </div>
         <Button disabled>
           <IconPlus data-icon="inline-start" />
@@ -524,7 +571,10 @@ function PendingComponent() {
       </div>
       <div className="flex flex-col gap-2">
         {[0, 1, 2].map((skeleton) => (
-          <Skeleton className="h-20" key={skeleton} />
+          <Skeleton
+            className="h-20"
+            key={skeleton}
+          />
         ))}
       </div>
     </div>

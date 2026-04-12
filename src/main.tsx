@@ -28,7 +28,10 @@ declare module "@tanstack/react-router" {
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="genta-ui-theme">
+      <ThemeProvider
+        defaultTheme="system"
+        storageKey="genta-ui-theme"
+      >
         <TooltipProvider>
           <RouterProvider router={router} />
         </TooltipProvider>

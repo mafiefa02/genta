@@ -45,7 +45,7 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon
-        render={<IconSelector className="pointer-events-none size-4 text-muted-foreground" />}
+        render={<IconSelector className="text-muted-foreground pointer-events-none size-4" />}
       />
     </SelectPrimitive.Trigger>
   );

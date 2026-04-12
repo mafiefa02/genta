@@ -75,8 +75,8 @@ export const soundsMutations = {
   }),
 
   /**
-   * Removes a sound from the database and deletes its file from app data.
-   * Also clears the reference from any schedules using it.
+   * Removes a sound from the database and deletes its file from app data. Also clears the reference
+   * from any schedules using it.
    *
    * @param options - Mutation options.
    */

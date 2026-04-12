@@ -32,7 +32,11 @@ export function WeekdayPicker({ value, onChange, availableDays, disabled }: Week
       className="w-full"
     >
       {days.map((day) => (
-        <ToggleGroupItem key={day.value} value={String(day.value)} className="flex-1">
+        <ToggleGroupItem
+          key={day.value}
+          value={String(day.value)}
+          className="flex-1"
+        >
           {day.label}
         </ToggleGroupItem>
       ))}

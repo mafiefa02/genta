@@ -1,5 +1,3 @@
-import type { SchedulePreset } from "-/lib/models";
-
 import bellAsset from "-/assets/bell3d.png";
 import { Button } from "-/components/ui/button";
 import { Input } from "-/components/ui/input";
@@ -12,6 +10,7 @@ import {
 } from "-/components/ui/select";
 import { presetsMutations } from "-/hooks/mutations/presets";
 import { presetsQueries } from "-/hooks/queries/presets";
+import type { SchedulePreset } from "-/lib/models";
 import { IconArrowRight, IconBell, IconCalendar, IconClock } from "@tabler/icons-react";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
@@ -29,14 +28,14 @@ function RouteComponent() {
   const hasPresets = presets.length > 0;
 
   return (
-    <main className="relative flex h-dvh flex-col overflow-hidden bg-linear-to-b from-background via-background to-primary/5">
+    <main className="from-background via-background to-primary/5 relative flex h-dvh flex-col overflow-hidden bg-linear-to-b">
       <header className="relative z-10 flex items-center justify-center px-6 py-4">
-        <span className="text-lg font-semibold tracking-tight text-primary">Genta</span>
+        <span className="text-primary text-lg font-semibold tracking-tight">Genta</span>
       </header>
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pb-11">
         <div className="relative mt-auto mb-6">
-          <div className="absolute inset-0 scale-150 rounded-full bg-primary/10 blur-3xl" />
+          <div className="bg-primary/10 absolute inset-0 scale-150 rounded-full blur-3xl" />
           <img
             src={bellAsset}
             alt="Bell"
@@ -45,10 +44,10 @@ function RouteComponent() {
         </div>
 
         <div className="mb-8 flex max-w-md flex-col items-center gap-3 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-5xl">
+          <h1 className="text-primary text-4xl font-bold tracking-tight sm:text-5xl">
             Selamat Datang
           </h1>
-          <p className="text-base text-pretty text-muted-foreground">
+          <p className="text-muted-foreground text-base text-pretty">
             Atur profil jadwal pertama Anda untuk mulai menggunakan Genta untuk mengatur jadwal bel
             sekolah
           </p>
@@ -57,10 +56,10 @@ function RouteComponent() {
         {hasPresets ? <SelectPresetControl presets={presets} /> : <CreatePresetControl />}
 
         <div className="mt-12 flex flex-col justify-center gap-4">
-          <span className="text-center text-sm text-muted-foreground">
+          <span className="text-muted-foreground text-center text-sm">
             Apa yang bisa Genta lakukan?
           </span>
-          <div className="flex gap-6 text-xs text-muted-foreground sm:gap-8">
+          <div className="text-muted-foreground flex gap-6 text-xs sm:gap-8">
             <div className="flex items-center gap-1.5">
               <IconClock className="size-3.5" />
               <span>Atur jadwal bel</span>
@@ -107,7 +106,10 @@ const CreatePresetControl = () => {
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           disabled={isPending}
         />
-        <Button onClick={handleSubmit} disabled={!name.trim() || isPending}>
+        <Button
+          onClick={handleSubmit}
+          disabled={!name.trim() || isPending}
+        >
           Mulai
           <IconArrowRight />
         </Button>
@@ -133,19 +135,28 @@ const SelectPresetControl = ({ presets }: { presets: SchedulePreset[] }) => {
   return (
     <div className="mb-auto flex w-full max-w-sm flex-col gap-3">
       <div className="flex gap-2">
-        <Select value={selectedId} onValueChange={(val: number | null) => setSelectedId(val)}>
+        <Select
+          value={selectedId}
+          onValueChange={(val: number | null) => setSelectedId(val)}
+        >
           <SelectTrigger className="flex-1">
             <SelectValue placeholder="Pilih profil..." />
           </SelectTrigger>
           <SelectContent>
             {presets.map((preset) => (
-              <SelectItem key={preset.id} value={preset.id}>
+              <SelectItem
+                key={preset.id}
+                value={preset.id}
+              >
                 {preset.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Button onClick={handleSubmit} disabled={selectedId == null || isPending}>
+        <Button
+          onClick={handleSubmit}
+          disabled={selectedId == null || isPending}
+        >
           Mulai
           <IconArrowRight />
         </Button>

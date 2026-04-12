@@ -13,10 +13,10 @@ A desktop application for managing school bell schedules. Built with Tauri 2, Re
 
 ## Tech Stack
 
-| Layer    | Technologies                                                 |
-| -------- | ------------------------------------------------------------ |
+| Layer    | Technologies                                                |
+| -------- | ----------------------------------------------------------- |
 | Frontend | React 19, TypeScript, Tailwind CSS 4, TanStack Router/Query |
-| Backend  | Tauri 2, Rust, SQLite (sqlx), rodio (audio playback)         |
+| Backend  | Tauri 2, Rust, SQLite (sqlx), rodio (audio playback)        |
 | Tooling  | Vite 7, pnpm, oxlint, oxfmt, husky, lint-staged             |
 
 ## Prerequisites
@@ -56,17 +56,18 @@ src-tauri/            # Backend (Rust/Tauri)
 
 ## Scripts
 
-| Command             | Description                      |
-| ------------------- | -------------------------------- |
-| `pnpm dev`          | Start the Vite dev server        |
-| `pnpm build`        | Build the frontend for production |
-| `pnpm tauri dev`    | Run the Tauri app (development)  |
-| `pnpm tauri build`  | Build the Tauri app (production) |
-| `pnpm lint`         | Lint code with oxlint            |
-| `pnpm fmt`          | Format code with oxfmt           |
+| Command            | Description                       |
+| ------------------ | --------------------------------- |
+| `pnpm dev`         | Start the Vite dev server         |
+| `pnpm build`       | Build the frontend for production |
+| `pnpm tauri dev`   | Run the Tauri app (development)   |
+| `pnpm tauri build` | Build the Tauri app (production)  |
+| `pnpm lint`        | Lint code with oxlint             |
+| `pnpm fmt`         | Format code with oxfmt            |
 
 ## Recommended IDE Setup
 
 [VS Code](https://code.visualstudio.com/) with extensions:
+
 - [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode)
 - [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)

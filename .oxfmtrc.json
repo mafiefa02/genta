@@ -1,21 +1,12 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "sortImports": {
-    "newlinesBetween": true,
-    "groups": [
-      "type-import",
-      ["value-builtin", "value-external"],
-      "type-internal",
-      "value-internal",
-      ["type-parent", "type-sibling", "type-index"],
-      ["value-parent", "value-sibling", "value-index"],
-      "unknown"
-    ]
+    "newlinesBetween": true
   },
+  "jsdoc": {},
+  "singleAttributePerLine": true,
   "sortTailwindcss": {
-    "stylesheet": "./src/styles.css",
-    "functions": ["clsx", "twMerge", "cn"],
-    "preserveWhitespace": true
+    "attributes": ["class"]
   },
-  "ignorePatterns": ["src/routeTree.gen.ts"]
+  "ignorePatterns": ["**/routeTree.gen.ts"]
 }

@@ -1,7 +1,6 @@
-import type { SchedulePreset, SchedulePresetWithDays } from "-/lib/models";
-
 import { getDb } from "-/lib/db";
 import { HelperQueryOptions } from "-/lib/helper-types";
+import type { SchedulePreset, SchedulePresetWithDays } from "-/lib/models";
 import { queryOptions } from "@tanstack/react-query";
 
 /** Database row structure for a schedule preset joined with its business days. */
@@ -11,8 +10,8 @@ type PresetRow = SchedulePreset & {
 };
 
 /**
- * Transforms a raw database row into a structured SchedulePresetWithDays object.
- * Parses the comma-separated business days and sorts them.
+ * Transforms a raw database row into a structured SchedulePresetWithDays object. Parses the
+ * comma-separated business days and sorts them.
  *
  * @param row - The raw database row.
  * @returns A formatted preset object.

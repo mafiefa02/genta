@@ -1,5 +1,3 @@
-import type { CustomSound, Schedule, ScheduleWithWeekdays } from "-/lib/models";
-
 import { Badge } from "-/components/ui/badge";
 import { Button } from "-/components/ui/button";
 import {
@@ -38,6 +36,7 @@ import { configQueries } from "-/hooks/queries/config";
 import { presetsQueries } from "-/hooks/queries/presets";
 import { schedulesQueries } from "-/hooks/queries/schedules";
 import { soundsQueries } from "-/hooks/queries/sounds";
+import type { CustomSound, Schedule, ScheduleWithWeekdays } from "-/lib/models";
 import {
   IconDotsVertical,
   IconPencil,
@@ -101,7 +100,7 @@ function RouteComponent() {
   if (!activePresetId || !activePreset) {
     return (
       <div className="mx-auto flex w-full flex-col gap-4">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Tidak ada preset aktif. Silakan aktifkan preset terlebih dahulu.
         </p>
       </div>
@@ -160,7 +159,7 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-lg font-medium">Jadwal</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Kelola jadwal bel untuk preset yang sedang aktif.
           </p>
         </div>
@@ -172,7 +171,7 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
 
       <div className="flex flex-col gap-3">
         <div className="relative">
-          <IconSearch className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <IconSearch className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             placeholder="Cari jadwal..."
             value={search}
@@ -191,13 +190,20 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
           variant="outline"
           className="w-full"
         >
-          <ToggleGroupItem value="all" className="flex-1">
+          <ToggleGroupItem
+            value="all"
+            className="flex-1"
+          >
             Semua
           </ToggleGroupItem>
           {businessDays.map((day) => {
             const label = WEEKDAYS.find((w) => w.value === day)?.label ?? String(day);
             return (
-              <ToggleGroupItem key={day} value={String(day)} className="flex-1">
+              <ToggleGroupItem
+                key={day}
+                value={String(day)}
+                className="flex-1"
+              >
                 {label}
               </ToggleGroupItem>
             );
@@ -207,7 +213,7 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed p-8 text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {search.trim()
               ? "Tidak ada jadwal yang cocok dengan pencarian."
               : "Belum ada jadwal untuk pencarian ini."}
@@ -221,7 +227,7 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
             return (
               <div
                 key={schedule.id}
-                className="flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border bg-card p-4"
+                className="bg-card flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border p-4"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
@@ -232,7 +238,7 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
                     </Badge>
                   </div>
                   {schedule.description && (
-                    <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mt-0.5 truncate text-sm">
                       {schedule.description}
                     </p>
                   )}
@@ -256,7 +262,14 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
                 </div>
 
                 <DropdownMenu>
-                  <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                      />
+                    }
+                  >
                     <IconDotsVertical />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -395,7 +408,10 @@ function CreateScheduleDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Buat Jadwal Baru</DialogTitle>
@@ -688,7 +704,10 @@ function ScheduleForm({
           </SelectTrigger>
           <SelectContent>
             {soundItems.map((item) => (
-              <SelectItem key={item.value ?? "default"} value={item.value}>
+              <SelectItem
+                key={item.value ?? "default"}
+                value={item.value}
+              >
                 {item.label}
               </SelectItem>
             ))}
@@ -714,7 +733,7 @@ const PendingHeader = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-lg font-medium">Jadwal</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Kelola jadwal bel untuk preset yang sedang aktif.
           </p>
         </div>
@@ -726,17 +745,34 @@ const PendingHeader = () => {
 
       <div className="flex flex-col gap-3">
         <div className="relative">
-          <IconSearch className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input disabled placeholder="Cari jadwal..." className="pl-9" />
+          <IconSearch className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <Input
+            disabled
+            placeholder="Cari jadwal..."
+            className="pl-9"
+          />
         </div>
-        <ToggleGroup disabled value={["all"]} size="sm" variant="outline" className="w-full">
-          <ToggleGroupItem value="all" className="flex-1">
+        <ToggleGroup
+          disabled
+          value={["all"]}
+          size="sm"
+          variant="outline"
+          className="w-full"
+        >
+          <ToggleGroupItem
+            value="all"
+            className="flex-1"
+          >
             Semua
           </ToggleGroupItem>
           {DEFAULT_BUSINESS_DAYS.map((day) => {
             const label = WEEKDAYS.find((w) => w.value === day)?.label ?? String(day);
             return (
-              <ToggleGroupItem key={day} value={String(day)} className="flex-1">
+              <ToggleGroupItem
+                key={day}
+                value={String(day)}
+                className="flex-1"
+              >
                 {label}
               </ToggleGroupItem>
             );
@@ -753,7 +789,10 @@ function PendingComponent() {
       <PendingHeader />
       <div className="flex flex-col gap-2">
         {[0, 1, 2, 3, 4, 5].map((skeleton) => (
-          <Skeleton className="h-24" key={skeleton} />
+          <Skeleton
+            className="h-24"
+            key={skeleton}
+          />
         ))}
       </div>
     </div>
@@ -764,8 +803,8 @@ function ErrorComponent() {
   return (
     <div className="mx-auto flex w-full flex-col gap-4 overflow-hidden">
       <PendingHeader />
-      <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-destructive p-8 text-center">
-        <p className="text-sm text-destructive">Terjadi kesalahan saat memuat laman ini.</p>
+      <div className="border-destructive flex flex-col items-center gap-2 rounded-2xl border border-dashed p-8 text-center">
+        <p className="text-destructive text-sm">Terjadi kesalahan saat memuat laman ini.</p>
       </div>
     </div>
   );

@@ -1,5 +1,3 @@
-import type { SchedulePreset, SchedulePresetWithDays } from "-/lib/models";
-
 import { Badge } from "-/components/ui/badge";
 import { Button } from "-/components/ui/button";
 import {
@@ -27,6 +25,7 @@ import { WEEKDAYS, WeekdayPicker } from "-/components/weekday-picker";
 import { DEFAULT_BUSINESS_DAYS, presetsMutations } from "-/hooks/mutations/presets";
 import { configQueries } from "-/hooks/queries/config";
 import { presetsQueries } from "-/hooks/queries/presets";
+import type { SchedulePreset, SchedulePresetWithDays } from "-/lib/models";
 import {
   IconCheck,
   IconDotsVertical,
@@ -72,7 +71,7 @@ function RouteComponent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-lg font-medium">Preset Jadwal</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Kelola preset untuk mengatur berbagai profil jadwal bel.
           </p>
         </div>
@@ -88,11 +87,11 @@ function RouteComponent() {
           return (
             <div
               key={preset.id}
-              className="flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border bg-card p-4"
+              className="bg-card flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border p-4"
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{preset.name}</p>
-                <p className="truncate text-sm text-muted-foreground">{preset.description}</p>
+                <p className="text-muted-foreground truncate text-sm">{preset.description}</p>
                 <div className="mt-2 flex gap-1">
                   {WEEKDAYS.map((day) => (
                     <Badge
@@ -115,7 +114,14 @@ function RouteComponent() {
                 </Badge>
               )}
               <DropdownMenu>
-                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                    />
+                  }
+                >
                   <IconDotsVertical />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -149,7 +155,10 @@ function RouteComponent() {
         })}
       </div>
 
-      <CreatePresetDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
+      <CreatePresetDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
 
       <Dialog
         open={editingPreset !== null}
@@ -158,7 +167,10 @@ function RouteComponent() {
         }}
       >
         {editingPreset && (
-          <EditPresetDialogContent preset={editingPreset} onClose={() => setEditingPreset(null)} />
+          <EditPresetDialogContent
+            preset={editingPreset}
+            onClose={() => setEditingPreset(null)}
+          />
         )}
       </Dialog>
 
@@ -211,7 +223,10 @@ function CreatePresetDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Buat Preset Baru</DialogTitle>
@@ -243,7 +258,11 @@ function CreatePresetDialog({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label>Hari Operasional</Label>
-            <WeekdayPicker value={businessDays} onChange={setBusinessDays} disabled={isPending} />
+            <WeekdayPicker
+              value={businessDays}
+              onChange={setBusinessDays}
+              disabled={isPending}
+            />
           </div>
         </div>
         <DialogFooter>
@@ -323,12 +342,19 @@ function EditPresetDialogContent({
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>Hari Operasional</Label>
-          <WeekdayPicker value={businessDays} onChange={setBusinessDays} disabled={isPending} />
+          <WeekdayPicker
+            value={businessDays}
+            onChange={setBusinessDays}
+            disabled={isPending}
+          />
         </div>
       </div>
       <DialogFooter>
         <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
-        <Button onClick={handleSubmit} disabled={!name.trim() || isPending}>
+        <Button
+          onClick={handleSubmit}
+          disabled={!name.trim() || isPending}
+        >
           Simpan
         </Button>
       </DialogFooter>
@@ -367,10 +393,14 @@ function DeletePresetDialogContent({
           dibatalkan.
         </DialogDescription>
       </DialogHeader>
-      {error && <p className="text-sm text-destructive">{error.message}</p>}
+      {error && <p className="text-destructive text-sm">{error.message}</p>}
       <DialogFooter>
         <DialogClose render={<Button variant="outline" />}>Batal</DialogClose>
-        <Button variant="destructive" onClick={() => deletePreset(preset.id)} disabled={isPending}>
+        <Button
+          variant="destructive"
+          onClick={() => deletePreset(preset.id)}
+          disabled={isPending}
+        >
           Hapus
         </Button>
       </DialogFooter>
@@ -384,7 +414,7 @@ function PendingComponent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-heading text-lg font-medium">Preset Jadwal</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Kelola preset untuk mengatur berbagai profil jadwal bel.
           </p>
         </div>
@@ -395,7 +425,10 @@ function PendingComponent() {
       </div>
       <div className="flex flex-col gap-2">
         {[0, 1, 2, 3, 4, 5].map((skeleton) => (
-          <Skeleton className="h-20" key={skeleton} />
+          <Skeleton
+            className="h-20"
+            key={skeleton}
+          />
         ))}
       </div>
     </div>

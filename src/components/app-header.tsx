@@ -28,7 +28,7 @@ import { useEffect, useRef, useState } from "react";
 
 export const AppHeader = () => {
   return (
-    <header className="sticky top-0 flex items-center justify-between border-b border-sidebar-border bg-sidebar px-4 py-2">
+    <header className="border-sidebar-border bg-sidebar sticky top-0 flex items-center justify-between border-b px-4 py-2">
       <div className="mx-auto flex flex-1 justify-between">
         <div className="flex min-w-0 items-center gap-2">
           <SidebarTrigger variant="outline" />
@@ -84,7 +84,13 @@ const PresetSwitcher = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={<Button size="sm" variant="outline" className="max-w-56 min-w-0" />}
+          render={
+            <Button
+              size="sm"
+              variant="outline"
+              className="max-w-56 min-w-0"
+            />
+          }
         >
           <IconCalendarUser className="shrink-0" />
           <span className="truncate">{activePreset.name}</span>
@@ -92,7 +98,7 @@ const PresetSwitcher = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuGroup>
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
+            <DropdownMenuLabel className="text-muted-foreground text-xs">
               Preset Jadwal
             </DropdownMenuLabel>
             {presets.map((preset) => (
@@ -120,7 +126,10 @@ const PresetSwitcher = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Preset Baru</DialogTitle>
@@ -134,7 +143,10 @@ const PresetSwitcher = () => {
             disabled={isCreating}
           />
           <DialogFooter>
-            <Button onClick={handleCreate} disabled={!newName.trim() || isCreating}>
+            <Button
+              onClick={handleCreate}
+              disabled={!newName.trim() || isCreating}
+            >
               Buat Preset
             </Button>
           </DialogFooter>

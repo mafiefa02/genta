@@ -14,8 +14,10 @@ import { useCallback, useEffect, useState } from "react";
 
 type UpdateState = "idle" | "checking" | "downloading" | "done" | "error";
 
-/** Example component to test the functionality of the updater
- *  @link https://v2.tauri.app/plugin/updater/#checking-for-updates
+/**
+ * Example component to test the functionality of the updater
+ *
+ * @link https://v2.tauri.app/plugin/updater/#checking-for-updates
  */
 export function SidebarUpdateChecker() {
   const { open: sidebarIsOpen } = useSidebar();
@@ -88,7 +90,10 @@ export function SidebarUpdateChecker() {
     );
   if (!update)
     return (
-      <NoUpdateState className={cn(!sidebarIsOpen && "justify-center")} onCheck={checkForUpdate} />
+      <NoUpdateState
+        className={cn(!sidebarIsOpen && "justify-center")}
+        onCheck={checkForUpdate}
+      />
     );
 
   return (

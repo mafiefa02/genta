@@ -52,13 +52,13 @@ export const AppSidebar = () => {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg">
               <Avatar>
-                <AvatarFallback className="border bg-primary text-background dark:text-foreground">
+                <AvatarFallback className="bg-primary text-background dark:text-foreground border">
                   <IconBell />
                 </AvatarFallback>
               </Avatar>
               <div className="grid leading-none">
                 <span className="font-semibold">Genta</span>
-                <span className="line-clamp-1 text-xs text-ellipsis text-muted-foreground">
+                <span className="text-muted-foreground line-clamp-1 text-xs text-ellipsis">
                   Aplikasi Bel
                 </span>
               </div>
@@ -138,7 +138,10 @@ const SidebarThemeToggle = () => {
       <DropdownMenuPortal>
         <DropdownMenuSubContent>
           {APP_THEMES.map((theme) => (
-            <DropdownMenuItem onClick={() => setActiveTheme(theme.id)} key={theme.id}>
+            <DropdownMenuItem
+              onClick={() => setActiveTheme(theme.id)}
+              key={theme.id}
+            >
               {theme.label}
               {theme.id === activeTheme && (
                 <DropdownMenuShortcut>

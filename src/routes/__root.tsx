@@ -1,9 +1,8 @@
-import type { QueryClient } from "@tanstack/react-query";
-
 import { getConfig } from "-/lib/config-store";
 import { getDb } from "-/lib/db";
 import { IconLoader } from "@tabler/icons-react";
 import { TanStackDevtools } from "@tanstack/react-devtools";
+import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";

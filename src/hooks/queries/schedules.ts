@@ -1,15 +1,14 @@
-import type { Schedule, ScheduleWithWeekdays } from "-/lib/models";
-
 import { getDb } from "-/lib/db";
 import { HelperQueryOptions } from "-/lib/helper-types";
+import type { Schedule, ScheduleWithWeekdays } from "-/lib/models";
 import { queryOptions } from "@tanstack/react-query";
 
 /** Database row structure for a schedule joined with its enabled weekdays. */
 type ScheduleRow = Schedule & { weekdays_csv: string | null };
 
 /**
- * Transforms a raw database row into a structured ScheduleWithWeekdays object.
- * Parses the comma-separated enabled weekdays and sorts them.
+ * Transforms a raw database row into a structured ScheduleWithWeekdays object. Parses the
+ * comma-separated enabled weekdays and sorts them.
  *
  * @param row - The raw database row.
  * @returns A formatted schedule object.
