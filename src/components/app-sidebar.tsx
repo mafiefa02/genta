@@ -1,3 +1,4 @@
+import { SidebarUpdateChecker } from "-/components/sidebar-update-checker";
 import { useTheme } from "-/components/theme-provider";
 import { Avatar, AvatarFallback } from "-/components/ui/avatar";
 import {
@@ -103,6 +104,9 @@ const NavigationMenu = ({ menus }: { menus: typeof SIDEBAR_MENU }) => {
 const Footer = () => {
   return (
     <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarUpdateChecker />
+      </SidebarMenuItem>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger render={<SidebarMenuButton tooltip="Preferensi" />}>
