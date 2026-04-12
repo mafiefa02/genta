@@ -1,10 +1,16 @@
 import { SidebarMenuButton, useSidebar } from "-/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "-/components/ui/tooltip";
 import { cn } from "-/lib/utils";
-import { IconDownload, IconLoader2, IconSquareRoundedCheck } from "@tabler/icons-react";
+import {
+  IconDownload,
+  IconLoader2,
+  IconRefresh,
+  IconSquareRoundedCheck,
+} from "@tabler/icons-react";
+import { getVersion } from "@tauri-apps/api/app";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { check, type Update } from "@tauri-apps/plugin-updater";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type UpdateState = "idle" | "checking" | "downloading" | "done" | "error";
 
@@ -18,7 +24,7 @@ export function SidebarUpdateChecker() {
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
+  const checkForUpdate = useCallback(() => {
     setStatus("checking");
     check()
       .then((update) => {
@@ -30,6 +36,10 @@ export function SidebarUpdateChecker() {
         setStatus("error");
       });
   }, []);
+
+  useEffect(() => {
+    checkForUpdate();
+  }, [checkForUpdate]);
 
   async function handleUpdate() {
     if (!update) return;
@@ -76,7 +86,10 @@ export function SidebarUpdateChecker() {
         error={error}
       />
     );
-  if (!update) return null;
+  if (!update)
+    return (
+      <NoUpdateState className={cn(!sidebarIsOpen && "justify-center")} onCheck={checkForUpdate} />
+    );
 
   return (
     <SidebarMenuButton
@@ -110,7 +123,9 @@ function CheckingForUpdateState({ className }: { className?: string }) {
       disabled
     >
       <IconLoader2 className="animate-spin" />
-      <span className="group-data-[collapsible=icon]:hidden">Mengecek versi terbaru...</span>
+      <span className="line-clamp-1 group-data-[collapsible=icon]:hidden">
+        Mengecek versi terbaru...
+      </span>
     </SidebarMenuButton>
   );
 }
@@ -124,7 +139,9 @@ function DoneUpdatingState({ className }: { className?: string }) {
       )}
     >
       <IconSquareRoundedCheck />
-      <span>Pembaruan terinstal, silakan mulai ulang.</span>
+      <span className="line-clamp-1 group-data-[collapsible=icon]:hidden">
+        Pembaruan terinstal, silakan mulai ulang.
+      </span>
     </SidebarMenuButton>
   );
 }
@@ -150,12 +167,36 @@ function FailedToUpdateState({
       >
         <IconDownload />
         <span className="line-clamp-1 group-data-[collapsible=icon]:hidden">
-          Gagal memperbarui. Coba lagi?
+          Pembaruan gagal. Coba lagi?
         </span>
       </SidebarMenuButton>
       <TooltipContent>
         Pembaruan gagal: {error || "Update failed with no error. Please contact the developer."}
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+function NoUpdateState({ onCheck, className }: { onCheck: () => void; className?: string }) {
+  const [version, setVersion] = useState<string | null>(null);
+
+  useEffect(() => {
+    getVersion().then(setVersion);
+  }, []);
+
+  return (
+    <SidebarMenuButton
+      className={cn(
+        className,
+        "border border-border bg-input/30 hover:bg-input/50 hover:text-foreground",
+      )}
+      tooltip="Cek pembaruan"
+      onClick={onCheck}
+    >
+      <IconRefresh />
+      <span className="line-clamp-1 group-data-[collapsible=icon]:hidden">
+        {version ? `v${version}` : "Cek pembaruan"}
+      </span>
+    </SidebarMenuButton>
   );
 }
