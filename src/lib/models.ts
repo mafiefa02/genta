@@ -49,4 +49,6 @@ export interface ScheduleTriggerLog {
   id: number;
   schedule_id: number;
   triggered_at: string;
+  status: "success" | "failed";
+  error_message: string | null;
 }
