@@ -22,7 +22,6 @@ function parseScheduleRow(row: ScheduleRow): ScheduleWithWeekdays {
     is_active: row.is_active,
     custom_sound_id: row.custom_sound_id,
     schedule_preset_id: row.schedule_preset_id,
-    next_trigger_at: row.next_trigger_at,
     description: row.description,
     created_at: row.created_at,
     updated_at: row.updated_at,

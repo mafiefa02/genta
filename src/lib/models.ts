@@ -54,8 +54,6 @@ export interface Schedule {
   custom_sound_id: number | null;
   /** ID of the preset this schedule belongs to. */
   schedule_preset_id: number;
-  /** The next calculated trigger time in ISO 8601 format. */
-  next_trigger_at: string | null;
   /** Optional notes about the schedule. */
   description: string | null;
   /** ISO 8601 timestamp of creation. */
