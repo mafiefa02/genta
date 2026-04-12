@@ -85,7 +85,7 @@ const CreatePresetControl = () => {
   const router = useRouter();
   const { mutate, isPending } = useMutation(
     presetsMutations.create({
-      onSuccess: () => router.navigate({ to: "/" }),
+      onSuccess: () => router.navigate({ to: "/schedules" }),
     }),
   );
 
@@ -121,7 +121,7 @@ const SelectPresetControl = ({ presets }: { presets: SchedulePreset[] }) => {
   const router = useRouter();
   const { mutate, isPending } = useMutation(
     presetsMutations.activate({
-      onSuccess: () => router.navigate({ to: "/" }),
+      onSuccess: () => router.navigate({ to: "/schedules" }),
     }),
   );
 
