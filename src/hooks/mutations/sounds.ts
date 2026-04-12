@@ -24,7 +24,7 @@ interface UpdateSoundInput {
 export const soundsMutations = {
   /**
    * Copies an external audio file to app data and registers it in the database.
-   * 
+   *
    * @param options - Mutation options.
    */
   create: (options?: HelperMutationOptions<void, CreateSoundInput>) => ({
@@ -42,7 +42,7 @@ export const soundsMutations = {
 
   /**
    * Updates sound metadata and optionally replaces the audio file.
-   * 
+   *
    * @param options - Mutation options.
    */
   update: (options?: HelperMutationOptions<void, UpdateSoundInput>) => ({
@@ -77,7 +77,7 @@ export const soundsMutations = {
   /**
    * Removes a sound from the database and deletes its file from app data.
    * Also clears the reference from any schedules using it.
-   * 
+   *
    * @param options - Mutation options.
    */
   delete: (options?: HelperMutationOptions<void, { id: number; filePath: string }>) => ({

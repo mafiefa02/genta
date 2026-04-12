@@ -9,7 +9,7 @@ interface ConfigSchema {
 
 /**
  * Retrieves a value from the configuration store.
- * 
+ *
  * @template K - The configuration key type.
  * @param key - The key to retrieve from the store.
  * @returns A promise that resolves to the configuration value or null if not found.
@@ -23,7 +23,7 @@ export async function getConfig<K extends keyof ConfigSchema>(
 
 /**
  * Updates or sets a value in the configuration store.
- * 
+ *
  * @template K - The configuration key type.
  * @param key - The key to set in the store.
  * @param value - The value to associate with the key.

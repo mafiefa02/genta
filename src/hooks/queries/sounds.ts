@@ -16,7 +16,7 @@ export const soundsQueries = {
 
   /**
    * Retrieves a list of all registered custom sounds.
-   * 
+   *
    * @param options - Query options.
    */
   list: (options?: HelperQueryOptions<CustomSound[]>) =>
@@ -33,7 +33,7 @@ export const soundsQueries = {
 
   /**
    * Counts how many schedules are currently using a specific sound.
-   * 
+   *
    * @param id - The ID of the sound to check.
    * @param options - Query options.
    */

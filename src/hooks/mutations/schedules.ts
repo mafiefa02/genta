@@ -35,7 +35,7 @@ interface UpdateScheduleInput {
 
 /**
  * Helper to batch insert active weekdays for a schedule.
- * 
+ *
  * @param db - The active database connection.
  * @param scheduleId - The ID of the schedule.
  * @param weekdays - Array of ISO weekdays (1-7).
@@ -57,7 +57,7 @@ async function insertScheduleWeekdays(
 export const schedulesMutations = {
   /**
    * Creates a new schedule within a preset.
-   * 
+   *
    * @param options - Mutation options.
    */
   create: (options?: HelperMutationOptions<void, CreateScheduleInput>) => ({
@@ -90,7 +90,7 @@ export const schedulesMutations = {
 
   /**
    * Updates an existing schedule's configuration and active days.
-   * 
+   *
    * @param options - Mutation options.
    */
   update: (options?: HelperMutationOptions<void, UpdateScheduleInput>) => ({
@@ -124,7 +124,7 @@ export const schedulesMutations = {
 
   /**
    * Deletes a schedule from the database.
-   * 
+   *
    * @param options - Mutation options.
    */
   delete: (options?: HelperMutationOptions<void, number>) => ({
@@ -138,7 +138,7 @@ export const schedulesMutations = {
 
   /**
    * Toggles whether a schedule is currently active (enabled).
-   * 
+   *
    * @param options - Mutation options.
    */
   toggleActive: (options?: HelperMutationOptions<void, { id: number; isActive: boolean }>) => ({

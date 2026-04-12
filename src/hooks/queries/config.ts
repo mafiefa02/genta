@@ -16,7 +16,7 @@ export const configQueries = {
 
   /**
    * Retrieves the ID of the currently active schedule preset.
-   * 
+   *
    * @param options - Query options.
    */
   activePresetId: (options?: QueryOptions<number | null>) =>

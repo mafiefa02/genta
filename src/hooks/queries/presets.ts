@@ -5,7 +5,7 @@ import { HelperQueryOptions } from "-/lib/helper-types";
 import { queryOptions } from "@tanstack/react-query";
 
 /** Database row structure for a schedule preset joined with its business days. */
-type PresetRow = SchedulePreset & { 
+type PresetRow = SchedulePreset & {
   /** Comma-separated list of ISO weekdays (1-7). */
   business_days_csv: string | null;
 };
@@ -13,7 +13,7 @@ type PresetRow = SchedulePreset & {
 /**
  * Transforms a raw database row into a structured SchedulePresetWithDays object.
  * Parses the comma-separated business days and sorts them.
- * 
+ *
  * @param row - The raw database row.
  * @returns A formatted preset object.
  */
@@ -47,7 +47,7 @@ export const presetsQueries = {
 
   /**
    * Retrieves a list of all presets including their active business days.
-   * 
+   *
    * @param options - Query options.
    */
   list: (options?: HelperQueryOptions<SchedulePresetWithDays[]>) =>
@@ -63,7 +63,7 @@ export const presetsQueries = {
 
   /**
    * Retrieves a single preset by its ID.
-   * 
+   *
    * @param id - The ID of the preset to fetch.
    * @param options - Query options.
    */

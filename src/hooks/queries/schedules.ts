@@ -10,7 +10,7 @@ type ScheduleRow = Schedule & { weekdays_csv: string | null };
 /**
  * Transforms a raw database row into a structured ScheduleWithWeekdays object.
  * Parses the comma-separated enabled weekdays and sorts them.
- * 
+ *
  * @param row - The raw database row.
  * @returns A formatted schedule object.
  */
@@ -49,7 +49,7 @@ export const schedulesQueries = {
 
   /**
    * Retrieves all schedules associated with a specific preset.
-   * 
+   *
    * @param presetId - The ID of the parent preset.
    * @param options - Query options.
    */
