@@ -42,7 +42,7 @@ export async function copyToAppData(sourcePath: string): Promise<string> {
   const lastDot = sourcePath.lastIndexOf(".");
   const lastSep = Math.max(sourcePath.lastIndexOf("/"), sourcePath.lastIndexOf("\\"));
   if (lastDot <= lastSep) {
-    throw new Error("File harus memiliki ekstensi.");
+    throw new Error("File needs to have an extension.");
   }
   const ext = sourcePath.substring(lastDot + 1);
   const filename = `${crypto.randomUUID()}.${ext}`;
