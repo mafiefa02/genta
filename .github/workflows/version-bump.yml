@@ -1,0 +1,54 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 1.2.0)"
+        required: true
+        type: string
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate version format
+        run: |
+          if ! echo "${{ inputs.version }}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Invalid version format '${{ inputs.version }}'. Expected: X.Y.Z"
+            exit 1
+          fi
+
+      - name: Update package.json
+        run: |
+          jq --arg v "${{ inputs.version }}" '.version = $v' package.json > tmp.json
+          mv tmp.json package.json
+
+      - name: Update tauri.conf.json
+        run: |
+          jq --arg v "${{ inputs.version }}" '.version = $v' src-tauri/tauri.conf.json > tmp.json
+          mv tmp.json src-tauri/tauri.conf.json
+
+      - name: Update Cargo.toml
+        run: |
+          sed -i 's/^version = ".*"/version = "${{ inputs.version }}"/' src-tauri/Cargo.toml
+
+      - name: Update Cargo.lock
+        run: |
+          cd src-tauri
+          cargo generate-lockfile 2>/dev/null || true
+
+      - name: Commit, tag, and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json src-tauri/Cargo.toml src-tauri/tauri.conf.json
+          git add src-tauri/Cargo.lock 2>/dev/null || true
+          git commit -m "chore: bump version to v${{ inputs.version }}"
+          git tag "v${{ inputs.version }}"
+          git push origin main --tags
