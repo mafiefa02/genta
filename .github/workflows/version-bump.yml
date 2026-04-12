@@ -24,6 +24,29 @@ jobs:
             exit 1
           fi
 
+      - name: Check version does not already exist
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "::error::Tag v${{ inputs.version }} already exists"
+            exit 1
+          fi
+
+      - name: Check version is not a downgrade
+        run: |
+          CURRENT=$(jq -r '.version' package.json)
+          INPUT="${{ inputs.version }}"
+
+          IFS='.' read -r CUR_MAJOR CUR_MINOR CUR_PATCH <<< "$CURRENT"
+          IFS='.' read -r IN_MAJOR IN_MINOR IN_PATCH <<< "$INPUT"
+
+          if [ "$IN_MAJOR" -lt "$CUR_MAJOR" ] || \
+             { [ "$IN_MAJOR" -eq "$CUR_MAJOR" ] && [ "$IN_MINOR" -lt "$CUR_MINOR" ]; } || \
+             { [ "$IN_MAJOR" -eq "$CUR_MAJOR" ] && [ "$IN_MINOR" -eq "$CUR_MINOR" ] && [ "$IN_PATCH" -le "$CUR_PATCH" ]; }; then
+            echo "::error::Version $INPUT is not greater than current version $CURRENT"
+            exit 1
+          fi
+
       - name: Update package.json
         run: |
           jq --arg v "${{ inputs.version }}" '.version = $v' package.json > tmp.json
