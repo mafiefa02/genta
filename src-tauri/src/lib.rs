@@ -23,6 +23,12 @@ pub fn run() {
             sql: include_str!("../migrations/0003_trigger_log_status.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 4,
+            description: "set null on schedule delete for trigger log",
+            sql: include_str!("../migrations/0004_trigger_log_set_null_on_delete.sql"),
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()
