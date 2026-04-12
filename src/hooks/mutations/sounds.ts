@@ -2,18 +2,31 @@ import { getDb } from "-/lib/db";
 import { HelperMutationOptions } from "-/lib/helper-types";
 import { copyToAppData, removeSoundFile } from "-/lib/sounds-fs";
 
+/** Input parameters for creating a new custom sound. */
 interface CreateSoundInput {
+  /** User-friendly label for the sound. */
   label: string;
+  /** Absolute system path to the source audio file. */
   sourcePath: string;
 }
 
+/** Input parameters for updating an existing custom sound. */
 interface UpdateSoundInput {
+  /** ID of the sound to update. */
   id: number;
+  /** New user-friendly label. */
   label: string;
+  /** Optional absolute system path to a new source file. */
   newSourcePath?: string;
 }
 
+/** Mutations for managing custom audio files. */
 export const soundsMutations = {
+  /**
+   * Copies an external audio file to app data and registers it in the database.
+   * 
+   * @param options - Mutation options.
+   */
   create: (options?: HelperMutationOptions<void, CreateSoundInput>) => ({
     mutationKey: ["sounds", "create"] as const,
     mutationFn: async ({ label, sourcePath }: CreateSoundInput) => {
@@ -27,6 +40,11 @@ export const soundsMutations = {
     ...options,
   }),
 
+  /**
+   * Updates sound metadata and optionally replaces the audio file.
+   * 
+   * @param options - Mutation options.
+   */
   update: (options?: HelperMutationOptions<void, UpdateSoundInput>) => ({
     mutationKey: ["sounds", "update"] as const,
     mutationFn: async ({ id, label, newSourcePath }: UpdateSoundInput) => {
@@ -56,6 +74,12 @@ export const soundsMutations = {
     ...options,
   }),
 
+  /**
+   * Removes a sound from the database and deletes its file from app data.
+   * Also clears the reference from any schedules using it.
+   * 
+   * @param options - Mutation options.
+   */
   delete: (options?: HelperMutationOptions<void, { id: number; filePath: string }>) => ({
     mutationKey: ["sounds", "delete"] as const,
     mutationFn: async ({ id, filePath }: { id: number; filePath: string }) => {

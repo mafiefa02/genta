@@ -1,24 +1,45 @@
 import { getDb } from "-/lib/db";
 import { HelperMutationOptions } from "-/lib/helper-types";
 
+/** Input parameters for creating a new schedule. */
 interface CreateScheduleInput {
+  /** Display label for the schedule. */
   label: string;
+  /** Optional detailed description. */
   description?: string;
+  /** Time of day to trigger, in seconds from midnight UTC. */
   utcTriggerTime: number;
+  /** ID of the preset this schedule belongs to. */
   presetId: number;
+  /** Array of ISO week days (1-7, 1=Monday) when this schedule is active. */
   weekdays: number[];
+  /** Optional ID of a custom sound to play at trigger time. */
   customSoundId?: number | null;
 }
 
+/** Input parameters for updating an existing schedule. */
 interface UpdateScheduleInput {
+  /** ID of the schedule to update. */
   id: number;
+  /** New display label. */
   label: string;
+  /** Updated description. */
   description?: string;
+  /** Updated trigger time in seconds from midnight UTC. */
   utcTriggerTime: number;
+  /** Updated array of ISO week days (1-7, 1=Monday). */
   weekdays: number[];
+  /** Updated custom sound ID. */
   customSoundId?: number | null;
 }
 
+/**
+ * Helper to batch insert active weekdays for a schedule.
+ * 
+ * @param db - The active database connection.
+ * @param scheduleId - The ID of the schedule.
+ * @param weekdays - Array of ISO weekdays (1-7).
+ */
 async function insertScheduleWeekdays(
   db: Awaited<ReturnType<typeof getDb>>,
   scheduleId: number,
@@ -32,7 +53,13 @@ async function insertScheduleWeekdays(
   }
 }
 
+/** Mutations for managing individual schedules. */
 export const schedulesMutations = {
+  /**
+   * Creates a new schedule within a preset.
+   * 
+   * @param options - Mutation options.
+   */
   create: (options?: HelperMutationOptions<void, CreateScheduleInput>) => ({
     mutationKey: ["schedules", "create"] as const,
     mutationFn: async ({
@@ -61,6 +88,11 @@ export const schedulesMutations = {
     ...options,
   }),
 
+  /**
+   * Updates an existing schedule's configuration and active days.
+   * 
+   * @param options - Mutation options.
+   */
   update: (options?: HelperMutationOptions<void, UpdateScheduleInput>) => ({
     mutationKey: ["schedules", "update"] as const,
     mutationFn: async ({
@@ -90,6 +122,11 @@ export const schedulesMutations = {
     ...options,
   }),
 
+  /**
+   * Deletes a schedule from the database.
+   * 
+   * @param options - Mutation options.
+   */
   delete: (options?: HelperMutationOptions<void, number>) => ({
     mutationKey: ["schedules", "delete"] as const,
     mutationFn: async (id: number) => {
@@ -99,6 +136,11 @@ export const schedulesMutations = {
     ...options,
   }),
 
+  /**
+   * Toggles whether a schedule is currently active (enabled).
+   * 
+   * @param options - Mutation options.
+   */
   toggleActive: (options?: HelperMutationOptions<void, { id: number; isActive: boolean }>) => ({
     mutationKey: ["schedules", "toggleActive"] as const,
     mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {

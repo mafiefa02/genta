@@ -4,8 +4,19 @@ import { getDb } from "-/lib/db";
 import { HelperQueryOptions } from "-/lib/helper-types";
 import { queryOptions } from "@tanstack/react-query";
 
-type PresetRow = SchedulePreset & { business_days_csv: string | null };
+/** Database row structure for a schedule preset joined with its business days. */
+type PresetRow = SchedulePreset & { 
+  /** Comma-separated list of ISO weekdays (1-7). */
+  business_days_csv: string | null;
+};
 
+/**
+ * Transforms a raw database row into a structured SchedulePresetWithDays object.
+ * Parses the comma-separated business days and sorts them.
+ * 
+ * @param row - The raw database row.
+ * @returns A formatted preset object.
+ */
 function parsePresetRow(row: PresetRow): SchedulePresetWithDays {
   return {
     id: row.id,
@@ -17,18 +28,28 @@ function parsePresetRow(row: PresetRow): SchedulePresetWithDays {
   };
 }
 
+/** SQL query template for fetching presets with their associated business days. */
 const PRESET_WITH_DAYS_SQL = `
   SELECT sp.*, GROUP_CONCAT(pbd.weekday) as business_days_csv
   FROM schedule_preset sp
   LEFT JOIN preset_business_day pbd ON pbd.preset_id = sp.id
 `;
 
+/** Queries for retrieving schedule presets. */
 export const presetsQueries = {
+  /** Query key factory for preset data. */
   keys: {
+    /** Root key for all preset queries. */
     all: ["presets"] as const,
+    /** Key for a specific preset's details. */
     detail: (id: number) => ["presets", id] as const,
   },
 
+  /**
+   * Retrieves a list of all presets including their active business days.
+   * 
+   * @param options - Query options.
+   */
   list: (options?: HelperQueryOptions<SchedulePresetWithDays[]>) =>
     queryOptions({
       queryKey: presetsQueries.keys.all,
@@ -40,6 +61,12 @@ export const presetsQueries = {
       ...options,
     }),
 
+  /**
+   * Retrieves a single preset by its ID.
+   * 
+   * @param id - The ID of the preset to fetch.
+   * @param options - Query options.
+   */
   byId: (id: number, options?: HelperQueryOptions<SchedulePresetWithDays | null>) =>
     queryOptions({
       queryKey: presetsQueries.keys.detail(id),

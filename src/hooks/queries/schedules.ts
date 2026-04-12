@@ -4,8 +4,16 @@ import { getDb } from "-/lib/db";
 import { HelperQueryOptions } from "-/lib/helper-types";
 import { queryOptions } from "@tanstack/react-query";
 
+/** Database row structure for a schedule joined with its enabled weekdays. */
 type ScheduleRow = Schedule & { weekdays_csv: string | null };
 
+/**
+ * Transforms a raw database row into a structured ScheduleWithWeekdays object.
+ * Parses the comma-separated enabled weekdays and sorts them.
+ * 
+ * @param row - The raw database row.
+ * @returns A formatted schedule object.
+ */
 function parseScheduleRow(row: ScheduleRow): ScheduleWithWeekdays {
   return {
     id: row.id,
@@ -22,18 +30,29 @@ function parseScheduleRow(row: ScheduleRow): ScheduleWithWeekdays {
   };
 }
 
+/** SQL query template for fetching schedules with their associated weekdays. */
 const SCHEDULE_WITH_WEEKDAYS_SQL = `
   SELECT s.*, GROUP_CONCAT(sw.weekday) as weekdays_csv
   FROM schedule s
   LEFT JOIN schedule_weekday sw ON sw.schedule_id = s.id
 `;
 
+/** Queries for retrieving schedules. */
 export const schedulesQueries = {
+  /** Query key factory for schedule data. */
   keys: {
+    /** Root key for all schedule queries. */
     all: ["schedules"] as const,
+    /** Key for all schedules belonging to a specific preset. */
     byPreset: (presetId: number) => ["schedules", "preset", presetId] as const,
   },
 
+  /**
+   * Retrieves all schedules associated with a specific preset.
+   * 
+   * @param presetId - The ID of the parent preset.
+   * @param options - Query options.
+   */
   byPreset: (presetId: number, options?: HelperQueryOptions<ScheduleWithWeekdays[]>) =>
     queryOptions({
       queryKey: schedulesQueries.keys.byPreset(presetId),
