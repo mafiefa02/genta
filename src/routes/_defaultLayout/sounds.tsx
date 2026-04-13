@@ -577,9 +577,10 @@ function DeleteSoundDialogContent({ sound, onClose }: { sound: CustomSound; onCl
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Hapus Suara</DialogTitle>
-        <DialogDescription>
-          Apakah Anda yakin ingin menghapus suara "{sound.label || sound.file_path}"? Tindakan ini
-          tidak dapat dibatalkan.
+        <DialogDescription className="overflow-hidden">
+          Apakah Anda yakin ingin menghapus suara "
+          <span className="break-all">{sound.label || sound.file_path}</span>
+          "? Tindakan ini tidak dapat dibatalkan.
         </DialogDescription>
         {scheduleCount != null && scheduleCount > 0 && (
           <DialogDescription className="text-amber-600 dark:text-amber-400">
