@@ -1,6 +1,20 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { BaseDirectory, copyFile, exists, mkdir, readFile, remove } from "@tauri-apps/plugin-fs";
 
+/** Supported audio file extensions for custom sounds. */
+export const SUPPORTED_AUDIO_EXTENSIONS = [
+  "mp3",
+  "wav",
+  "ogg",
+  "aac",
+  "m4a",
+  "mpeg",
+  "webm",
+  "3gp",
+  "mid",
+  "midi",
+] as const;
+
 /**
  * Ensures the 'sounds' directory exists in the application data directory. Creates it recursively
  * if it doesn't exist.
@@ -23,7 +37,7 @@ export async function pickAudioFile(): Promise<string | null> {
     filters: [
       {
         name: "Audio",
-        extensions: ["mp3", "wav", "ogg", "aac", "m4a", "mpeg", "webm", "3gp", "mid", "midi"],
+        extensions: [...SUPPORTED_AUDIO_EXTENSIONS],
       },
     ],
   });

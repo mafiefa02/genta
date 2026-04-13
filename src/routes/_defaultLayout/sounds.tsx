@@ -22,8 +22,14 @@ import { Label } from "-/components/ui/label";
 import { Skeleton } from "-/components/ui/skeleton";
 import { soundsMutations } from "-/hooks/mutations/sounds";
 import { soundsQueries } from "-/hooks/queries/sounds";
+import { useTauriDragDrop } from "-/hooks/use-tauri-drag-drop";
 import type { CustomSound } from "-/lib/models";
-import { getAbsoluteFileBlobUrl, getSoundBlobUrl, pickAudioFile } from "-/lib/sounds-fs";
+import {
+  SUPPORTED_AUDIO_EXTENSIONS,
+  getAbsoluteFileBlobUrl,
+  getSoundBlobUrl,
+  pickAudioFile,
+} from "-/lib/sounds-fs";
 import {
   IconDotsVertical,
   IconFileMusic,
@@ -37,6 +43,8 @@ import {
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+const ALLOWED_EXTENSIONS_SET = new Set<string>(SUPPORTED_AUDIO_EXTENSIONS);
 
 export const Route = createFileRoute("/_defaultLayout/sounds")({
   component: RouteComponent,
@@ -228,6 +236,23 @@ function CreateSoundDialog({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
 
+  const labelRef = useRef(label);
+  labelRef.current = label;
+
+  const { isDragOver, dropError, clearDropError } = useTauriDragDrop({
+    allowedExtensions: ALLOWED_EXTENSIONS_SET,
+    enabled: open,
+    onDrop: (path) => {
+      setSelectedPath(path);
+      stopPreview();
+      if (!labelRef.current.trim()) {
+        const fileName = path.split("/").pop()?.split("\\").pop() ?? "";
+        const nameWithoutExt = fileName.replace(/\.[^.]+$/, "");
+        setLabel(nameWithoutExt);
+      }
+    },
+  });
+
   const { mutate: create, isPending } = useMutation(
     soundsMutations.create({
       onSuccess: () => {
@@ -242,6 +267,7 @@ function CreateSoundDialog({
     setLabel("");
     setSelectedPath(null);
     stopPreview();
+    clearDropError();
   }
 
   function stopPreview() {
@@ -310,43 +336,52 @@ function CreateSoundDialog({
         <div className="flex flex-col gap-3 overflow-hidden">
           <div className="flex flex-col gap-1.5">
             <Label>File Audio</Label>
-            {selectedPath ? (
-              <div className="bg-muted/50 flex items-center gap-2 rounded-xl border p-3">
-                <IconFileMusic
-                  className="text-muted-foreground shrink-0"
-                  size={20}
-                />
-                <span className="min-w-0 flex-1 truncate text-sm">
-                  {selectedPath.split("/").pop()?.split("\\").pop()}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={togglePreview}
-                  disabled={isPending}
+            <div>
+              {selectedPath ? (
+                <div
+                  className={`bg-muted/50 flex items-center gap-2 rounded-xl border p-3 transition-shadow ${isDragOver ? "ring-primary ring-2" : ""}`}
                 >
-                  {isPreviewPlaying ? <IconPlayerPause size={16} /> : <IconPlayerPlay size={16} />}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                  <IconFileMusic
+                    className="text-muted-foreground shrink-0"
+                    size={20}
+                  />
+                  <span className="min-w-0 flex-1 truncate text-sm">
+                    {selectedPath.split("/").pop()?.split("\\").pop()}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={togglePreview}
+                    disabled={isPending}
+                  >
+                    {isPreviewPlaying ? (
+                      <IconPlayerPause size={16} />
+                    ) : (
+                      <IconPlayerPlay size={16} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePickFile}
+                    disabled={isPending}
+                  >
+                    Ganti
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  type="button"
                   onClick={handlePickFile}
                   disabled={isPending}
+                  className={`text-muted-foreground hover:border-primary hover:text-foreground flex w-full cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-6 transition-colors ${isDragOver ? "border-primary bg-primary/5 text-foreground" : ""}`}
                 >
-                  Ganti
-                </Button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handlePickFile}
-                disabled={isPending}
-                className="text-muted-foreground hover:border-primary hover:text-foreground flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed p-6 transition-colors"
-              >
-                <IconUpload size={24} />
-                <span className="text-sm">Klik untuk memilih file audio</span>
-              </button>
-            )}
+                  <IconUpload size={24} />
+                  <span className="text-sm">Klik atau seret file audio ke sini</span>
+                </button>
+              )}
+            </div>
+            {dropError && <p className="text-destructive text-sm">{dropError}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="create-label">Label</Label>
@@ -380,6 +415,14 @@ function EditSoundDialogContent({ sound, onClose }: { sound: CustomSound; onClos
   const [newSourcePath, setNewSourcePath] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+
+  const { isDragOver, dropError } = useTauriDragDrop({
+    allowedExtensions: ALLOWED_EXTENSIONS_SET,
+    onDrop: (path) => {
+      setNewSourcePath(path);
+      stopPreview();
+    },
+  });
 
   const { mutate: update, isPending } = useMutation(
     soundsMutations.update({
@@ -455,7 +498,9 @@ function EditSoundDialogContent({ sound, onClose }: { sound: CustomSound; onClos
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <Label>File Audio</Label>
-          <div className="bg-muted/50 flex items-center gap-2 rounded-xl border p-3">
+          <div
+            className={`bg-muted/50 flex items-center gap-2 rounded-xl border p-3 transition-shadow ${isDragOver ? "ring-primary ring-2" : ""}`}
+          >
             <IconFileMusic
               className="text-muted-foreground shrink-0"
               size={20}
@@ -488,6 +533,7 @@ function EditSoundDialogContent({ sound, onClose }: { sound: CustomSound; onClos
               Ganti
             </Button>
           </div>
+          {dropError && <p className="text-destructive text-sm">{dropError}</p>}
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="edit-label">Label</Label>
