@@ -307,7 +307,7 @@ function CreateSoundDialog({
           <DialogTitle>Tambah Suara</DialogTitle>
           <DialogDescription>Pilih file audio dan beri label untuk suara kustom.</DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 overflow-hidden">
           <div className="flex flex-col gap-1.5">
             <Label>File Audio</Label>
             {selectedPath ? (
