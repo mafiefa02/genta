@@ -80,9 +80,16 @@ function localToUtcSeconds(hours: number, minutes: number) {
   return (((local + offsetSeconds) % 86400) + 86400) % 86400;
 }
 
-/** Format hours and minutes as "HH:MM". */
+/** Format hours and minutes as "HH:MM" (for <input type="time"> values). */
 function fmtTime(hours: number, minutes: number) {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+/** Format hours and minutes using the user's locale (e.g. "07:00" or "7:00 AM"). */
+function fmtTimeLocale(hours: number, minutes: number) {
+  const d = new Date();
+  d.setHours(hours, minutes, 0, 0);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 /** Parse an "HH:MM" string into { hours, minutes }. */
@@ -231,7 +238,7 @@ function ScheduleList({ presetId, businessDays }: { presetId: number; businessDa
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="truncate font-medium">{fmtTime(hours, minutes)}</p>
+                    <p className="truncate font-medium">{fmtTimeLocale(hours, minutes)}</p>
                     <p className="truncate font-medium">{schedule.label}</p>
                     <Badge variant={isActive ? "default" : "outline"}>
                       {isActive ? "Aktif" : "Nonaktif"}
@@ -361,23 +368,28 @@ function CreateScheduleDialog({
   const queryClient = useQueryClient();
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
-  const [time, setTime] = useState("07:00");
+  const [time, setTime] = useState(() => {
+    const now = new Date();
+    return fmtTime(now.getHours(), now.getMinutes());
+  });
   const [weekdays, setWeekdays] = useState<number[]>(defaultSelectedDays);
   const [customSoundId, setCustomSoundId] = useState<number | null>(null);
 
   const resetForm = () => {
+    const now = new Date();
     setLabel("");
     setDescription("");
-    setTime("07:00");
+    setTime(fmtTime(now.getHours(), now.getMinutes()));
     setWeekdays(defaultSelectedDays);
     setCustomSoundId(null);
   };
 
   useEffect(() => {
     if (open) {
+      const now = new Date();
       setLabel("");
       setDescription("");
-      setTime("07:00");
+      setTime(fmtTime(now.getHours(), now.getMinutes()));
       setWeekdays(defaultSelectedDays);
       setCustomSoundId(null);
     }
